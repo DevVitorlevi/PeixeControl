@@ -69,6 +69,9 @@ export const Login = () => {
 
                 const { token, user } = response.data;
 
+                console.log('Token recebido:', token);
+                console.log('Usuário recebido:', user);
+
                 // Chama login no contexto, que grava localStorage
                 login(user, token);
 
@@ -82,15 +85,15 @@ export const Login = () => {
             } catch (error) {
                 const msg = error.response?.data?.message || 'Erro ao fazer login';
                 setFlash({ type: 'error', message: msg });
+                console.error('Erro no login:', error);
             }
         }
     };
 
+    const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => {
         setShowPassword(prev => !prev);
     };
-
-    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <>

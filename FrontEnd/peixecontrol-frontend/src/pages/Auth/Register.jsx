@@ -75,6 +75,7 @@ export const Register = () => {
             [name]: value,
         }));
 
+        // Limpa erros enquanto digita
         if (name === 'email') {
             setErrors((prev) => ({
                 ...prev,
@@ -122,7 +123,7 @@ export const Register = () => {
                 const response = await api.post('/auth/register', formData);
                 const { message, token, user } = response.data;
 
-                // Centraliza armazenamento no contexto
+                // Faz login automático pelo contexto
                 login(user, token);
 
                 setFlash({ type: 'success', message });
