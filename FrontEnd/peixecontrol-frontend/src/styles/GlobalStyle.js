@@ -2,7 +2,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-  /* Reset básico */
+  
   *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -15,6 +15,8 @@ const GlobalStyles = createGlobalStyle`
     background-color: #f0f4f8;
     margin: 0;
     padding: 0;
+    width: 100vw;
+    height: 100vh;
   }
 
   a {
@@ -36,8 +38,6 @@ const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     font-size: 1rem;
   }
-
-  /* Scrollbar estilizada (opcional) */
   ::-webkit-scrollbar {
     width: 8px;
   }

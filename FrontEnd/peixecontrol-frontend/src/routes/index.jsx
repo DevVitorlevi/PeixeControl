@@ -5,7 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import Header from '../components/Header';
 import Sidebar from '../components/SideBar';
 import Estoque from '../pages/Estoque';
-import { useContext } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 
 function PrivateLayout({ children }) {
@@ -19,8 +19,21 @@ function PrivateLayout({ children }) {
 }
 
 function PrivateRoute({ children }) {
-    const { user } = useContext(AuthContext);
-    return user ? children : <Navigate to="/" />;
+    const { token } = useContext(AuthContext);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Espera token carregar (que inicialmente é undefined)
+        if (token !== undefined) {
+            setLoading(false);
+        }
+    }, [token]);
+
+    if (loading) {
+        return <div>Carregando...</div>; // Pode substituir por um spinner bonito
+    }
+
+    return token ? children : <Navigate to="/" />;
 }
 
 export default function AppRoutes() {

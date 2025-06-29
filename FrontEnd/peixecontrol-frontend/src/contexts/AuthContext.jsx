@@ -3,7 +3,9 @@ import { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+    // Inicializa token como undefined para controlar carregamento
     const [user, setUser] = useState(null);
+    const [token, setToken] = useState(undefined);
 
     useEffect(() => {
         console.log('AuthProvider useEffect - lendo localStorage...');
@@ -19,38 +21,42 @@ export function AuthProvider({ children }) {
                 storedToken !== 'undefined' &&
                 storedToken !== 'null'
             ) {
-                console.log('Usuário e token encontrados no localStorage:', storedUser, storedToken);
                 setUser(JSON.parse(storedUser));
+                setToken(storedToken);
+                console.log('Usuário e token carregados com sucesso.');
             } else {
-                console.log('Nenhum usuário/token válido encontrado no localStorage');
                 localStorage.removeItem('user');
                 localStorage.removeItem('token');
+                setUser(null);
+                setToken(null);
             }
         } catch (error) {
             console.error('Erro ao ler usuário do localStorage:', error);
             localStorage.removeItem('user');
             localStorage.removeItem('token');
+            setUser(null);
+            setToken(null);
         }
     }, []);
 
-
-    function login(userData, token) {
-        console.log('Função login chamada:', userData, token);
+    function login(userData, tokenData) {
         setUser(userData);
+        setToken(tokenData);
         localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', tokenData);
         console.log('Usuário e token salvos no localStorage');
     }
 
     function logout() {
-        console.log('Logout chamado - limpando usuário e token');
         setUser(null);
+        setToken(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
+        console.log('Usuário deslogado e dados removidos do localStorage');
     }
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
