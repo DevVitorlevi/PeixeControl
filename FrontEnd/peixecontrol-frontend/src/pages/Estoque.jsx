@@ -152,15 +152,30 @@ export default function Estoque() {
                                 <Td>{produto.quantity}</Td>
                                 <Td>{produto.pricePerKg.toFixed(2)}</Td>
                                 <Td>
-                                    <button onClick={() => openEditModal(produto)}>Editar</button>
+                                    <button
+                                        onClick={() => openEditModal(produto)}
+                                        style={{
+                                            backgroundColor: '#003366',
+                                            color: '#ffffff',
+                                            border: 'none',
+                                            padding: '9px',
+                                            borderRadius: '10px',
+                                            cursor: 'pointer',
+                                            fontWeight: 'bold',
+                                        }}
+                                    >
+                                        Editar
+                                    </button>
                                     <button
                                         onClick={() => handleDelete(produto._id)}
                                         style={{
                                             marginLeft: 10,
-                                            color: 'red',
+                                            color: 'white',
                                             cursor: 'pointer',
-                                            background: 'none',
+                                            background: 'red',
                                             border: 'none',
+                                            padding: '9px',
+                                            borderRadius: '10px',
                                         }}
                                     >
                                         Excluir
