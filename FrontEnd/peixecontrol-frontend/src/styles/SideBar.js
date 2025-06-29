@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { NavLink } from 'react-router-dom';
+import styled from 'styled-components';
 
 export const SidebarContainer = styled.nav`
   width: 250px;
@@ -21,9 +21,11 @@ export const StyledLink = styled(NavLink)`
 
   &.active {
     background-color: #0f52ba;
+    color:#daa520 ;
   }
 
   &:hover {
-    background-color: #0f52ba;
+    background-color:#0f52ba;
+    color: #daa520;
   }
 `;

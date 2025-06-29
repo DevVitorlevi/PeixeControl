@@ -4,6 +4,7 @@ import { Register } from '../pages/Auth/Register';
 import Dashboard from '../pages/Dashboard';
 import Header from '../components/Header';
 import Sidebar from '../components/SideBar';
+import Estoque from '../pages/Estoque';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -34,6 +35,16 @@ export default function AppRoutes() {
                         <PrivateRoute>
                             <PrivateLayout>
                                 <Dashboard />
+                            </PrivateLayout>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/estoque"
+                    element={
+                        <PrivateRoute>
+                            <PrivateLayout>
+                                <Estoque />
                             </PrivateLayout>
                         </PrivateRoute>
                     }
