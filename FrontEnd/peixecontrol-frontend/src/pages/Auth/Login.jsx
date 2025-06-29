@@ -23,19 +23,13 @@ export const Login = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [serverError, setServerError] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [flash, setFlash] = useState({ type: '', message: '' }); // estado do flash
+    const [flash, setFlash] = useState({ type: '', message: '' });
     const inputEmailRef = useRef(null);
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
 
-
-
     useEffect(() => {
-        if (inputEmailRef.current) {
-            inputEmailRef.current.focus();
-        }
+        inputEmailRef.current?.focus();
     }, []);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -43,14 +37,11 @@ export const Login = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
 
         if (name === 'email') {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
+            setErrors(prev => ({
+                ...prev,
                 email: emailRegex.test(value) ? '' : 'E-mail inválido'
             }));
         }
@@ -64,44 +55,42 @@ export const Login = () => {
         if (!emailRegex.test(formData.email)) {
             newErrors.email = 'E-mail inválido';
         }
-
         if (formData.password.length < 6) {
             newErrors.password = 'Senha muito curta';
         }
 
         setErrors(newErrors);
-        setServerError('');
         setFlash({ type: '', message: '' });
 
         if (Object.keys(newErrors).length === 0) {
             try {
                 const response = await axios.post('http://localhost:3333/auth/login', formData);
+                console.log('Resposta da API:', response.data);
 
-                const { token, user: userData } = response.data;
-                localStorage.setItem('token', token);
-                login(userData);
+                const { token, user } = response.data;
 
+                // Chama login no contexto, que grava localStorage
+                login(user, token);
 
                 setFlash({ type: 'success', message: 'Login realizado com sucesso!' });
-
                 setFormData({ email: '', password: '' });
 
-                // Redireciona após 1.5s para dar tempo da animação da flash message aparecer
                 setTimeout(() => {
                     navigate('/dashboard');
                 }, 1500);
 
             } catch (error) {
                 const msg = error.response?.data?.message || 'Erro ao fazer login';
-                setServerError(msg);
                 setFlash({ type: 'error', message: msg });
             }
         }
     };
 
     const togglePasswordVisibility = () => {
-        setShowPassword((prevShow) => !prevShow);
+        setShowPassword(prev => !prev);
     };
+
+    const [showPassword, setShowPassword] = useState(false);
 
     return (
         <>
@@ -121,7 +110,7 @@ export const Login = () => {
                 <FormSpace>
                     <Head>
                         <h1>
-                            Conecte-se <span>THINKER</span>
+                            Conecte-se <span>PeixeControl</span>
                         </h1>
                     </Head>
                     <FormContainer>
@@ -152,7 +141,7 @@ export const Login = () => {
                                     placeholder='Senha'
                                 />
                                 <Lock className="icon" />
-                                <span onClick={togglePasswordVisibility}>
+                                <span onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
                                     {showPassword ? <EyeClosed className="eye-c" /> : <Eye className="eye" />}
                                 </span>
                                 {errors.password && <p className="error-message">{errors.password}</p>}
@@ -160,7 +149,7 @@ export const Login = () => {
 
                             <ButtonSubmit type="submit">Entrar</ButtonSubmit>
                             <Link to="/register">
-                                Novo no THINKER? Cadastre-se
+                                Novo no PeixeControl? Cadastre-se
                             </Link>
                         </form>
                     </FormContainer>

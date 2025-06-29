@@ -11,12 +11,22 @@ import {
     CriteriaItem,
     IconWrapper,
 } from '../../styles/Form';
-import { User, AtSign, Eye, EyeClosed, Lock, XCircle, CheckCircle } from 'lucide-react';
+
+import {
+    User,
+    AtSign,
+    Eye,
+    EyeClosed,
+    Lock,
+    XCircle,
+    CheckCircle,
+} from 'lucide-react';
+
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { ImageSlider } from '../../components/ImageSlide';
 import { FlashMessage } from '../../components/FlashMessage';
-import { AuthContext } from '../../contexts/AuthContext'
+import { AuthContext } from '../../contexts/AuthContext';
 
 export const Register = () => {
     const [formData, setFormData] = useState({
@@ -24,39 +34,34 @@ export const Register = () => {
         email: '',
         password: '',
     });
+
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const [errors, setErrors] = useState({});
-    const [serverError, setServerError] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [flash, setFlash] = useState({ type: '', message: '' });
-    const { login } = useContext(UserContext);
+    const [showPassword, setShowPassword] = useState(false);
     const inputNameRef = useRef(null);
     const [passwordFocused, setPasswordFocused] = useState(false);
     const [isPasswordValid, setIsPasswordValid] = useState(false);
 
     useEffect(() => {
-        if (inputNameRef.current) {
-            inputNameRef.current.focus();
-        }
+        inputNameRef.current?.focus();
     }, []);
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+    // Critérios de senha
     const hasNumber = (str) => /\d/.test(str);
     const hasUpperCase = (str) => /[A-Z]/.test(str);
     const hasMinLength = (str) => str.length >= 8;
     const hasSpecialChar = (str) => /[!@#$%^&*(),.?":{}|<>]/.test(str);
 
-    const allCriteriaMet = () => {
-        const pwd = formData.password;
-        return (
-            hasNumber(pwd) &&
-            hasUpperCase(pwd) &&
-            hasMinLength(pwd) &&
-            hasSpecialChar(pwd)
-        );
-    };
+    const allCriteriaMet = () =>
+        hasNumber(formData.password) &&
+        hasUpperCase(formData.password) &&
+        hasMinLength(formData.password) &&
+        hasSpecialChar(formData.password);
 
     useEffect(() => {
         setIsPasswordValid(allCriteriaMet());
@@ -65,22 +70,29 @@ export const Register = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setFormData((prevData) => ({
-            ...prevData,
+        setFormData((prev) => ({
+            ...prev,
             [name]: value,
         }));
 
         if (name === 'email') {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
+            setErrors((prev) => ({
+                ...prev,
                 email: emailRegex.test(value) ? '' : 'E-mail inválido',
             }));
         }
 
         if (name === 'password' && errors.password) {
-            setErrors((prevErrors) => ({
-                ...prevErrors,
+            setErrors((prev) => ({
+                ...prev,
                 password: '',
+            }));
+        }
+
+        if (name === 'name' && errors.name && value.trim().length >= 3) {
+            setErrors((prev) => ({
+                ...prev,
+                name: '',
             }));
         }
     };
@@ -103,33 +115,26 @@ export const Register = () => {
         }
 
         setErrors(newErrors);
-        setServerError('');
         setFlash({ type: '', message: '' });
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await api.post('/users/register', {
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                });
-
+                const response = await api.post('/auth/register', formData);
                 const { message, token, user } = response.data;
 
+                // Centraliza armazenamento no contexto
+                login(user, token);
+
                 setFlash({ type: 'success', message });
-                localStorage.setItem('token', token);
-                login(user);
-
                 setFormData({ name: '', email: '', password: '' });
-
-                if (inputNameRef.current) inputNameRef.current.focus();
+                inputNameRef.current?.focus();
 
                 setTimeout(() => {
-                    navigate('/home');
+                    navigate('/dashboard');
                 }, 1500);
             } catch (err) {
-                const errorMsg = err.response?.data?.message || 'Erro ao cadastrar usuário';
-                setServerError(errorMsg);
+                const errorMsg =
+                    err.response?.data?.message || 'Erro ao cadastrar usuário';
                 setFlash({ type: 'error', message: errorMsg });
                 console.error('Erro no cadastro:', err);
             }
@@ -137,7 +142,7 @@ export const Register = () => {
     };
 
     const togglePasswordVisibility = () => {
-        setShowPassword((prevShow) => !prevShow);
+        setShowPassword((prev) => !prev);
     };
 
     return (
@@ -158,7 +163,7 @@ export const Register = () => {
                 <FormSpace>
                     <Head>
                         <h1>
-                            Junte-se ao <span>THINKER</span>
+                            Junte-se ao <span>PeixeControl</span>
                         </h1>
                     </Head>
                     <FormContainer>
@@ -206,7 +211,16 @@ export const Register = () => {
                                     autoComplete="new-password"
                                 />
                                 <Lock className="icon" />
-                                <span onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                                <span
+                                    onClick={togglePasswordVisibility}
+                                    style={{ cursor: 'pointer' }}
+                                    aria-label="Toggle password visibility"
+                                    role="button"
+                                    tabIndex={0}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') togglePasswordVisibility();
+                                    }}
+                                >
                                     {showPassword ? (
                                         <EyeClosed className="eye-c" />
                                     ) : (
@@ -268,11 +282,11 @@ export const Register = () => {
                                 Cadastrar
                             </ButtonSubmit>
 
-                            <Link to="/login">Já possui conta? Entre</Link>
+                            <Link to="/">Já possui conta? Entre</Link>
                         </form>
                     </FormContainer>
                 </FormSpace>
-            </Wrapper >
+            </Wrapper>
         </>
     );
 };

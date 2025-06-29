@@ -172,6 +172,9 @@ export const InputContent = styled.div`
   ::placeholder{
     font-size: 1.4rem;
     color: #1884f7;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-40%);
   }
 
   @media screen and (min-width: 768px) and (max-width:1180px){

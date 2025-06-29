@@ -1,6 +1,4 @@
-8uj7yh,ng6mbtfv5rcd4exs3wz2ybhr7u45njt8imk9ol,0p;.-[=/'
-    {\}
-    |:?P_LO>0K<I(jmu8hn7ybg6tvf5rc4dex3 swz26yhdnf7ujr5tm8gik6y9,olu0.p/[o'']
+
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
