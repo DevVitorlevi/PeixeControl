@@ -1,4 +1,4 @@
-// src/controllers/ProductController.js
+
 const Product = require('../models/Product');
 
 module.exports = {
@@ -21,6 +21,11 @@ module.exports = {
         });
 
         return res.status(201).json(product);
+    },
+
+    async list(req, res) {
+        const products = await Product.find({ userId: req.userId }).sort({ name: 1 });
+        return res.json(products);
     },
 
     async update(req, res) {
@@ -46,5 +51,17 @@ module.exports = {
         }
 
         return res.json(product);
+    },
+
+    async delete(req, res) {
+        const { id } = req.params;
+
+        const product = await Product.findOneAndDelete({ _id: id, userId: req.userId });
+
+        if (!product) {
+            return res.status(404).json({ message: 'Produto não encontrado!' });
+        }
+
+        return res.json({ message: 'Produto deletado com sucesso!' });
     }
 };

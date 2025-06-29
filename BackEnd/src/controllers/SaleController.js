@@ -1,17 +1,22 @@
-// src/controllers/SaleController.js
+
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
 
 module.exports = {
     async create(req, res) {
-        const { productId, quantitySold } = req.body;
+        const { productId, quantitySold, paymentMethod } = req.body;
 
-        if (!productId || quantitySold == null) {
-            return res.status(400).json({ message: 'Produto e quantidade vendida são obrigatórios!' });
+        if (!productId || quantitySold == null || !paymentMethod) {
+            return res.status(400).json({ message: 'Produto, quantidade e forma de pagamento são obrigatórios!' });
         }
 
         if (quantitySold <= 0) {
             return res.status(400).json({ message: 'A quantidade vendida deve ser maior que zero!' });
+        }
+
+        const validPayments = ['Pix', 'Dinheiro', 'Cartão de Crédito', 'Cartão de Débito'];
+        if (!validPayments.includes(paymentMethod)) {
+            return res.status(400).json({ message: 'Forma de pagamento inválida!' });
         }
 
         const product = await Product.findOne({ _id: productId, userId: req.userId });
@@ -32,12 +37,18 @@ module.exports = {
             productName: product.name,
             quantitySold,
             pricePerKg: product.pricePerKg,
-            total
+            total,
+            paymentMethod
         });
 
         product.quantity -= quantitySold;
         await product.save();
 
         return res.status(201).json(sale);
+    },
+
+    async list(req, res) {
+        const sales = await Sale.find({ userId: req.userId }).sort({ saleDate: -1 });
+        return res.json(sales);
     }
 };

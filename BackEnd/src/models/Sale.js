@@ -28,6 +28,11 @@ const SaleSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    paymentMethod: { 
+        type: String,
+        required: true,
+        enum: ['Pix', 'Dinheiro', 'Cartão de Crédito', 'Cartão de Débito']
+    },
     saleDate: {
         type: Date,
         default: Date.now

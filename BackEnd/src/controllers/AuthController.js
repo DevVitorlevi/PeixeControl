@@ -1,4 +1,4 @@
-// src/controllers/AuthController.js
+
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,7 +7,6 @@ module.exports = {
     async register(req, res) {
         const { name, email, password } = req.body;
 
-        // Validações simples
         if (!name || !email || !password) {
             return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
         }
