@@ -5,6 +5,14 @@ module.exports = {
     async create(req, res) {
         const { name, pricePerKg, quantity } = req.body;
 
+        if (!name || pricePerKg == null || quantity == null) {
+            return res.status(400).json({ message: 'Nome, preço e quantidade são obrigatórios!' });
+        }
+
+        if (pricePerKg <= 0 || quantity < 0) {
+            return res.status(400).json({ message: 'Preço deve ser maior que zero e quantidade não pode ser negativa!' });
+        }
+
         const product = await Product.create({
             userId: req.userId,
             name,
@@ -15,14 +23,17 @@ module.exports = {
         return res.status(201).json(product);
     },
 
-    async list(req, res) {
-        const products = await Product.find({ userId: req.userId });
-        return res.json(products);
-    },
-
     async update(req, res) {
         const { id } = req.params;
         const { name, pricePerKg, quantity } = req.body;
+
+        if (!name || pricePerKg == null || quantity == null) {
+            return res.status(400).json({ message: 'Nome, preço e quantidade são obrigatórios!' });
+        }
+
+        if (pricePerKg <= 0 || quantity < 0) {
+            return res.status(400).json({ message: 'Preço deve ser maior que zero e quantidade não pode ser negativa!' });
+        }
 
         const product = await Product.findOneAndUpdate(
             { _id: id, userId: req.userId },
@@ -35,17 +46,5 @@ module.exports = {
         }
 
         return res.json(product);
-    },
-
-    async delete(req, res) {
-        const { id } = req.params;
-
-        const product = await Product.findOneAndDelete({ _id: id, userId: req.userId });
-
-        if (!product) {
-            return res.status(404).json({ message: 'Produto não encontrado!' });
-        }
-
-        return res.json({ message: 'Produto removido com sucesso!' });
     }
 };
