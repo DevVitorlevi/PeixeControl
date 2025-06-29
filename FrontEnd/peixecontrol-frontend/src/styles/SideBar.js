@@ -8,7 +8,7 @@ export const HamburgerButton = styled.button`
   font-size: 28px;
   background: none;
   border: none;
-  color: #084298;
+  color:rgb(255, 255, 255);
   cursor: pointer;
   z-index: 1001;
 
