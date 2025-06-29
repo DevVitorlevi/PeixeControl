@@ -1,19 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config();
+const app = express()
 
-
-const app = express();
+const authRoutes = require('./routes/auth.routes');
 
 app.use(cors());
 app.use(express.json());
+app.use('/auth', authRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log('✅ MongoDB Atlas Connected'))
   .catch(err => console.log('❌ MongoDB Connection Error: ', err));
-
-
-
 module.exports = app;
