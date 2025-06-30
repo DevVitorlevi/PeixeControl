@@ -17,19 +17,31 @@ export default function Dashboard() {
     const [totalEstoque, setTotalEstoque] = useState(0);
     const [produtosBaixoEstoque, setProdutosBaixoEstoque] = useState(0);
     const [vendasDia, setVendasDia] = useState(0);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchUser();
-        fetchEstoque();
-        // Se tiver rota de vendas, chame aqui: fetchVendasDia();
+        loadDashboardData();
     }, []);
+
+    async function loadDashboardData() {
+        try {
+            await fetchUser();
+            await fetchEstoque();
+            // Caso crie vendas: await fetchVendasDia();
+        } catch (error) {
+            toast.error('Erro ao carregar informações do dashboard.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     async function fetchUser() {
         try {
-            const response = await api.get('/users/me'); // Certifique-se que tem uma rota para pegar o user
+            const response = await api.get('/users/me');
             setNomePeixaria(response.data.name);
         } catch (error) {
-            toast.error('Erro ao carregar usuário');
+            console.error('Erro ao buscar usuário:', error.response?.data || error.message);
+            throw error;
         }
     }
 
@@ -43,7 +55,7 @@ export default function Dashboard() {
 
             produtos.forEach(produto => {
                 total += produto.quantity;
-                if (produto.quantity <= 5) { // Defina o valor de estoque baixo
+                if (produto.quantity <= 5) {
                     baixoEstoque += 1;
                 }
             });
@@ -51,21 +63,20 @@ export default function Dashboard() {
             setTotalEstoque(total);
             setProdutosBaixoEstoque(baixoEstoque);
         } catch (error) {
-            toast.error('Erro ao carregar estoque');
+            console.error('Erro ao buscar estoque:', error.response?.data || error.message);
+            throw error;
         }
     }
 
-    // Caso você tenha rota de vendas do dia
-    /*
-    async function fetchVendasDia() {
-        try {
-            const response = await api.get('/sales/today');
-            setVendasDia(response.data.total);
-        } catch (error) {
-            toast.error('Erro ao carregar vendas do dia');
-        }
+    if (loading) {
+        return (
+            <ContentContainer>
+                <DashboardContainer>
+                    <Greeting>Carregando...</Greeting>
+                </DashboardContainer>
+            </ContentContainer>
+        );
     }
-    */
 
     return (
         <ContentContainer>
