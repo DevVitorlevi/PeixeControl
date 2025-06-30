@@ -11,12 +11,10 @@ import {
     ReportsList,
     ReportListItem,
     ReportModalOverlay,
-    ReportModalContent
+    ReportModalContent,
+    DailySummaryCard
 } from '../styles/ReportStyles';
-
-
 import { CartList, CartItem } from '../styles/SalesStyles';
-
 
 export default function Reports() {
     const [salesSummary, setSalesSummary] = useState(null);
@@ -27,7 +25,6 @@ export default function Reports() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
 
-    // Alerta contínuo
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
@@ -40,7 +37,7 @@ export default function Reports() {
             } catch {
                 console.error('Erro ao verificar estoque baixo');
             }
-        }, 300000); // 5 min
+        }, 300000);
 
         return () => clearInterval(interval);
     }, []);
@@ -106,12 +103,20 @@ export default function Reports() {
         setSelectedSale(null);
     }
 
+    const dailyTotals = salesHistory.reduce(
+        (acc, sale) => {
+            acc.totalValue += sale.total;
+            acc.totalKg += sale.items.reduce((sum, item) => sum + item.quantitySold, 0);
+            return acc;
+        },
+        { totalValue: 0, totalKg: 0 }
+    );
+
     return (
         <ContentContainer>
             <ReportsContainer>
                 <Title>Relatórios de Vendas</Title>
 
-                {/* Calendário */}
                 <Title>Selecionar Data</Title>
                 <ReactDatePicker
                     selected={selectedDate}
@@ -120,22 +125,10 @@ export default function Reports() {
                     inline
                 />
 
-                {/* Resumo de Vendas */}
-                {salesSummary ? (
-                    <ReportCard>
-                        <p><strong>Total Vendido:</strong> R$ {salesSummary.totalSalesValue?.toFixed(2) || '0.00'}</p>
-                        <p><strong>Quantidade Vendida:</strong> {salesSummary.totalQuantity ?? 0} kg</p>
-                    </ReportCard>
-                ) : (
-                    <p>Carregando resumo...</p>
-                )}
-
-                {/* Lucro */}
                 <ReportCard>
                     <p><strong>Lucro Total:</strong> R$ {profit != null ? profit.toFixed(2) : '0.00'}</p>
                 </ReportCard>
 
-                {/* Produtos Mais Vendidos */}
                 <Title>Produtos Mais Vendidos</Title>
                 <ReportsList>
                     {topProducts.length > 0 ? (
@@ -149,7 +142,6 @@ export default function Reports() {
                     )}
                 </ReportsList>
 
-                {/* Estoque Baixo */}
                 <Title>Produtos com Estoque Baixo</Title>
                 <ReportsList>
                     {lowStock.length > 0 ? (
@@ -163,7 +155,6 @@ export default function Reports() {
                     )}
                 </ReportsList>
 
-                {/* Histórico Visual */}
                 <Title>Vendas no Dia Selecionado</Title>
                 <CartList>
                     {salesHistory.length > 0 ? (
@@ -179,7 +170,14 @@ export default function Reports() {
                     )}
                 </CartList>
 
-                {/* Modal Detalhado */}
+                {salesHistory.length > 0 && (
+                    <DailySummaryCard>
+                        <h3>Resumo do Dia</h3>
+                        <p>Total Vendido: R$ {dailyTotals.totalValue.toFixed(2)}</p>
+                        <p>Quantidade Vendida: {dailyTotals.totalKg.toFixed(2)} kg</p>
+                    </DailySummaryCard>
+                )}
+
                 {selectedSale && (
                     <ReportModalOverlay onClick={handleCloseModal}>
                         <ReportModalContent onClick={(e) => e.stopPropagation()}>

@@ -24,6 +24,7 @@ export const ReportCard = styled.div`
   text-align: center;
   margin-bottom: 20px;
   width: 100%;
+  margin-top: 2rem;
   max-width: 500px;
 
   @media (max-width: 768px) {
@@ -190,5 +191,40 @@ export const ReportModalContent = styled.div`
     font-weight: bold;
     font-size: 1.8rem;
     color: rgb(49, 107, 231);
+  }
+`;
+export const DailySummaryCard = styled.div`
+  background-color: #e8f5e9; /* Verde bem claro */
+  border: 2px solid #2ecc71; /* Verde vivo para borda */
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+  width: 60vw;
+
+  text-align: center;
+
+  @media (max-width: 768px) {
+    width: 90%;
+    margin: 0 auto 20px auto;
+  }
+
+  h3 {
+    font-size: 1.8rem;
+    color: #27ae60;
+    margin-bottom: 15px;
+  }
+
+  p {
+    font-size: 1.6rem;
+    color: #27ae60;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  span {
+    color: #145a32;
+    font-weight: bold;
+    font-size: 1.4rem;
   }
 `;
