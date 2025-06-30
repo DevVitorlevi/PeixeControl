@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import api from '../services/api';
+import { toast } from 'react-toastify';
 import {
     SalesContainer,
     Title,
@@ -6,21 +8,26 @@ import {
     Input,
     Select,
     Button,
-    SalesList,
-    SaleItem,
-    Totalizer
+    CartList,
+    CartItem,
+    RemoveButton,
+    Totalizer,
+    ModalOverlay,
+    ModalContent,
+    CloseButton
 } from '../styles/SalesStyles';
 import { ContentContainer } from '../styles/ContentContainer';
-import api from '../services/api';
-import { toast } from 'react-toastify';
 
 export default function Sales() {
     const [products, setProducts] = useState([]);
     const [productId, setProductId] = useState('');
     const [quantity, setQuantity] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Pix');
+    const [cart, setCart] = useState([]);
     const [sales, setSales] = useState([]);
     const [totalVendas, setTotalVendas] = useState(0);
+
+    const [selectedSale, setSelectedSale] = useState(null);
 
     useEffect(() => {
         fetchProducts();
@@ -31,7 +38,7 @@ export default function Sales() {
         try {
             const response = await api.get('/products');
             setProducts(response.data);
-        } catch (error) {
+        } catch {
             toast.error('Erro ao carregar produtos');
         }
     }
@@ -41,7 +48,6 @@ export default function Sales() {
             const response = await api.get('/sales');
             const vendas = response.data;
 
-            // Filtra vendas do dia
             const hoje = new Date();
             hoje.setHours(0, 0, 0, 0);
 
@@ -52,18 +58,14 @@ export default function Sales() {
 
             setSales(vendasHoje);
 
-            // Calcula total vendas do dia
             const total = vendasHoje.reduce((acc, sale) => acc + sale.total, 0);
             setTotalVendas(total);
-
-        } catch (error) {
+        } catch {
             toast.error('Erro ao carregar vendas');
         }
     }
 
-    async function handleRegisterSale(e) {
-        e.preventDefault();
-
+    function handleAddToCart() {
         if (!productId || !quantity) {
             toast.error('Preencha todos os campos');
             return;
@@ -75,30 +77,62 @@ export default function Sales() {
             return;
         }
 
+        const cartItem = {
+            productId: product._id,
+            productName: product.name,
+            quantitySold: Number(quantity),
+            pricePerKg: product.pricePerKg
+        };
+
+        setCart([...cart, cartItem]);
+        setProductId('');
+        setQuantity('');
+    }
+
+    function handleRemoveFromCart(index) {
+        const newCart = [...cart];
+        newCart.splice(index, 1);
+        setCart(newCart);
+    }
+
+    async function handleRegisterSale(e) {
+        e.preventDefault();
+
+        if (cart.length === 0) {
+            toast.error('Adicione produtos ao carrinho');
+            return;
+        }
+
+        const total = cart.reduce((acc, item) => acc + (item.pricePerKg * item.quantitySold), 0);
+
         try {
             await api.post('/sales', {
-                productId,
-                quantitySold: quantity,        // usar quantitySold aqui
-                paymentMethod                  // só enviar os campos esperados no backend
+                items: cart,
+                total,
+                paymentMethod
             });
 
             toast.success('Venda registrada com sucesso!');
             fetchSales();
-
-            // Resetar formulário
-            setProductId('');
-            setQuantity('');
+            setCart([]);
             setPaymentMethod('Pix');
-        } catch (error) {
+        } catch {
             toast.error('Erro ao registrar venda');
-            console.error(error.response?.data || error.message);
         }
+    }
+
+    function handleSaleClick(sale) {
+        setSelectedSale(sale);
+    }
+
+    function closeModal() {
+        setSelectedSale(null);
     }
 
     return (
         <ContentContainer>
             <SalesContainer>
-                <Title>Registro de Vendas</Title>
+                <Title>Caixa - Registro de Vendas</Title>
 
                 <Form onSubmit={handleRegisterSale}>
                     <Select value={productId} onChange={e => setProductId(e.target.value)}>
@@ -114,10 +148,21 @@ export default function Sales() {
                         type="number"
                         placeholder="Quantidade (kg)"
                         value={quantity}
-                        onChange={e => setQuantity(Number(e.target.value))}
+                        onChange={e => setQuantity(e.target.value)}
                         min="0"
                         step="0.01"
                     />
+
+                    <Button type="button" onClick={handleAddToCart}>Adicionar ao Carrinho</Button>
+
+                    <CartList>
+                        {cart.map((item, index) => (
+                            <CartItem key={index}>
+                                {item.productName} - {item.quantitySold} kg - R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                                <RemoveButton onClick={() => handleRemoveFromCart(index)}>Remover</RemoveButton>
+                            </CartItem>
+                        ))}
+                    </CartList>
 
                     <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
                         <option value="Pix">Pix</option>
@@ -126,20 +171,40 @@ export default function Sales() {
                         <option value="Dinheiro">Dinheiro</option>
                     </Select>
 
-                    <Button type="submit">Registrar Venda</Button>
+                    <Button type="submit">Finalizar Venda</Button>
                 </Form>
 
-                <SalesList>
-                    {sales.map(sale => (
-                        <SaleItem key={sale._id}>
-                            <span>{sale.productName} - {sale.quantitySold} kg</span>
+                <Title>Vendas do Dia</Title>
+                <CartList>
+                    {sales.map((sale, index) => (
+                        <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
+                            <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
                             <span>R$ {sale.total.toFixed(2)}</span>
-                        </SaleItem>
+                        </CartItem>
                     ))}
-                </SalesList>
+                </CartList>
 
                 <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
             </SalesContainer>
+
+            {selectedSale && (
+                <ModalOverlay onClick={closeModal}>
+                    <ModalContent onClick={e => e.stopPropagation()}>
+                        <CloseButton onClick={closeModal}>X</CloseButton>
+                        <h3>Detalhes da Venda</h3>
+                        <ul>
+                            {selectedSale.items.map((item, index) => (
+                                <li key={index}>
+                                    {item.productName} — {item.quantitySold} kg — R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                                </li>
+                            ))}
+                        </ul>
+                        <p>Total: R$ {selectedSale.total.toFixed(2)}</p>
+                        <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
+                        <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
         </ContentContainer>
     );
 }

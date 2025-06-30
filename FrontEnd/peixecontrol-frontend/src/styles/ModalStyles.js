@@ -22,7 +22,7 @@ export const Overlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 9999;
   animation: ${fadeInScale} 0.3s ease forwards;
 `;
 export const ModalContainer = styled.div`
