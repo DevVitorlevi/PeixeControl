@@ -3,25 +3,26 @@ const Product = require('../models/Product');
 
 module.exports = {
     async create(req, res) {
-        const { name, pricePerKg, quantity } = req.body;
+    const { name, pricePerKg, costPerKg, quantity } = req.body;
 
-        if (!name || pricePerKg == null || quantity == null) {
-            return res.status(400).json({ message: 'Nome, preço e quantidade são obrigatórios!' });
-        }
+    if (!name || pricePerKg == null || costPerKg == null || quantity == null) {
+        return res.status(400).json({ message: 'Nome, preço de venda, custo e quantidade são obrigatórios!' });
+    }
 
-        if (pricePerKg <= 0 || quantity < 0) {
-            return res.status(400).json({ message: 'Preço deve ser maior que zero e quantidade não pode ser negativa!' });
-        }
+    if (pricePerKg <= 0 || costPerKg < 0 || quantity < 0) {
+        return res.status(400).json({ message: 'Preço deve ser maior que zero, custo não pode ser negativo e quantidade não pode ser negativa!' });
+    }
 
-        const product = await Product.create({
-            userId: req.userId,
-            name,
-            pricePerKg,
-            quantity
-        });
+    const product = await Product.create({
+        userId: req.userId,
+        name,
+        pricePerKg,
+        costPerKg,
+        quantity
+    });
 
-        return res.status(201).json(product);
-    },
+    return res.status(201).json(product);
+},
 
     async list(req, res) {
         const products = await Product.find({ userId: req.userId }).sort({ name: 1 });
@@ -29,29 +30,29 @@ module.exports = {
     },
 
     async update(req, res) {
-        const { id } = req.params;
-        const { name, pricePerKg, quantity } = req.body;
+    const { id } = req.params;
+    const { name, pricePerKg, costPerKg, quantity } = req.body;
 
-        if (!name || pricePerKg == null || quantity == null) {
-            return res.status(400).json({ message: 'Nome, preço e quantidade são obrigatórios!' });
-        }
+    if (!name || pricePerKg == null || costPerKg == null || quantity == null) {
+        return res.status(400).json({ message: 'Nome, preço de venda, custo e quantidade são obrigatórios!' });
+    }
 
-        if (pricePerKg <= 0 || quantity < 0) {
-            return res.status(400).json({ message: 'Preço deve ser maior que zero e quantidade não pode ser negativa!' });
-        }
+    if (pricePerKg <= 0 || costPerKg < 0 || quantity < 0) {
+        return res.status(400).json({ message: 'Preço deve ser maior que zero, custo não pode ser negativo e quantidade não pode ser negativa!' });
+    }
 
-        const product = await Product.findOneAndUpdate(
-            { _id: id, userId: req.userId },
-            { name, pricePerKg, quantity },
-            { new: true }
-        );
+    const product = await Product.findOneAndUpdate(
+        { _id: id, userId: req.userId },
+        { name, pricePerKg, costPerKg, quantity },
+        { new: true }
+    );
 
-        if (!product) {
-            return res.status(404).json({ message: 'Produto não encontrado!' });
-        }
+    if (!product) {
+        return res.status(404).json({ message: 'Produto não encontrado!' });
+    }
 
-        return res.json(product);
-    },
+    return res.json(product);
+},
 
     async delete(req, res) {
         const { id } = req.params;

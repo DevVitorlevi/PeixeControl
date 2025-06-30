@@ -46,12 +46,12 @@ export const ReportsList = styled.ul`
 `;
 
 export const ReportListItem = styled.li`
-  background-color: #ecf0f1;
+  background-color:rgb(242, 48, 35);
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 10px;
   font-size: 1.1rem;
-  color: #34495e;
+  color:rgb(255, 255, 255);
   display: flex;
   justify-content: space-between;
 
@@ -140,5 +140,55 @@ export const SearchButton = styled.button`
 
   &:hover {
     background-color: #1e8449;
+  }
+`;
+
+export const ReportModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+`;
+
+export const ReportModalContent = styled.div`
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 700px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 2rem;
+    color: #34495e;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+
+  li {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: rgb(245, 193, 7);
+    font-weight: bold;
+  }
+
+  p {
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 1.8rem;
+    color: rgb(49, 107, 231);
   }
 `;

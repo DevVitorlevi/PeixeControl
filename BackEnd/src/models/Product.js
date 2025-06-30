@@ -14,10 +14,11 @@ const ProductSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    costPerKg: { // ✅ NOVO
-        type: Number,
-        required: true
-    },
+costPerKg: {
+    type: Number,
+    required: true,
+    default: 0 // Valor padrão para produtos antigos
+},
     quantity: {
         type: Number,
         required: true

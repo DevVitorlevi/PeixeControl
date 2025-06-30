@@ -127,6 +127,24 @@ export default function Reports() {
                     <p>Carregando resumo...</p>
                 )}
 
+                {/* Lucro */}
+                <ReportCard>
+                    <p><strong>Lucro Total:</strong> R$ {profit != null ? profit.toFixed(2) : '0.00'}</p>
+                </ReportCard>
+
+                {/* Produtos Mais Vendidos */}
+                <Title>Produtos Mais Vendidos</Title>
+                <ReportsList>
+                    {topProducts.length > 0 ? (
+                        topProducts.map(prod => (
+                            <ReportListItem key={prod._id}>
+                                {prod.productName} — {prod.totalQuantity} kg — R$ {prod.totalSalesValue?.toFixed(2) || '0.00'}
+                            </ReportListItem>
+                        ))
+                    ) : (
+                        <p>Nenhum produto encontrado</p>
+                    )}
+                </ReportsList>
 
                 {/* Estoque Baixo */}
                 <Title>Produtos com Estoque Baixo</Title>
@@ -148,15 +166,16 @@ export default function Reports() {
                     {salesHistory.length > 0 ? (
                         salesHistory.map((sale, index) => (
                             <CartItem key={index} onClick={() => handleOpenModal(sale)}>
-                                <div><strong>Itens:</strong> {sale.items.length}</div>
-                                <div><strong>Valor:</strong> R$ {sale.total.toFixed(2)}</div>
-                                <div><strong>Data:</strong> {new Date(sale.saleDate).toLocaleDateString()}</div>
+                                <span>Venda de {sale.items.length} item(s)</span>
+                                <span>R$ {sale.total.toFixed(2)}</span>
+                                <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
                             </CartItem>
                         ))
                     ) : (
                         <p>Nenhuma venda registrada neste dia</p>
                     )}
                 </CartList>
+
                 {/* Modal Detalhado */}
                 {selectedSale && (
                     <ReportModalOverlay onClick={handleCloseModal}>

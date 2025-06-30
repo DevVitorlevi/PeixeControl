@@ -70,29 +70,34 @@ export const Button = styled.button`
 
 export const CartContainer = styled.div`
   margin-top: 20px;
-`;
+  `;
 
 export const CartList = styled.ul`
   list-style: none;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
 `;
 
 export const CartItem = styled.li`
-  background-color: #f9f9f9;
+  background-color: #084298;
   padding: 20px 25px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   margin-bottom: 12px;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
+  flex-direction: row;
   gap: 8px;
   font-size: 1.4rem;
-  color: #34495e;
+  color:rgb(255, 255, 255);
   transition: background-color 0.3s;
-
+  width: 60vw;
   &:hover {
-    background-color: #e9f0f7;
+    background-color:rgb(24, 118, 212);
   }
 `;
 
