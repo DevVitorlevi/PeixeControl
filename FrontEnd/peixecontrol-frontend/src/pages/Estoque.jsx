@@ -7,6 +7,7 @@ import {
     Th,
     Td,
     ButtonAdd,
+    ActionButton,
 } from '../styles/EstoqueStyles';
 
 import {
@@ -19,6 +20,7 @@ import {
     Button,
 } from '../styles/ModalStyles';
 
+import { ContentContainer } from '../styles/ContentContainer';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 
@@ -30,7 +32,6 @@ export default function Estoque() {
     const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
 
-    // Buscar produtos
     async function fetchProdutos() {
         try {
             setLoading(true);
@@ -99,8 +100,6 @@ export default function Estoque() {
             pricePerKg: precoNum,
         };
 
-        console.log('Enviando produto:', produtoEnviado);
-
         try {
             if (editingId) {
                 await api.patch(`/products/${editingId}`, produtoEnviado);
@@ -129,101 +128,82 @@ export default function Estoque() {
     }
 
     return (
-        <EstoqueContainer>
-            <Title>Estoque</Title>
-            <ButtonAdd onClick={openAddModal}>+ Adicionar Produto</ButtonAdd>
+        <ContentContainer>
+            <EstoqueContainer>
+                <Title>Estoque</Title>
+                <ButtonAdd onClick={openAddModal}>+ Adicionar Produto</ButtonAdd>
 
-            {loading ? (
-                <p>Carregando produtos...</p>
-            ) : (
-                <Table>
-                    <Thead>
-                        <tr>
-                            <Th>Nome do Peixe</Th>
-                            <Th>Quantidade (kg)</Th>
-                            <Th>Preço por kg (R$)</Th>
-                            <Th>Ações</Th>
-                        </tr>
-                    </Thead>
-                    <tbody>
-                        {produtos.map(produto => (
-                            <tr key={produto._id}>
-                                <Td>{produto.name}</Td>
-                                <Td>{produto.quantity}</Td>
-                                <Td>{produto.pricePerKg.toFixed(2)}</Td>
-                                <Td>
-                                    <button
-                                        onClick={() => openEditModal(produto)}
-                                        style={{
-                                            backgroundColor: '#003366',
-                                            color: '#ffffff',
-                                            border: 'none',
-                                            padding: '9px',
-                                            borderRadius: '10px',
-                                            cursor: 'pointer',
-                                            fontWeight: 'bold',
-                                        }}
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(produto._id)}
-                                        style={{
-                                            marginLeft: 10,
-                                            color: 'white',
-                                            cursor: 'pointer',
-                                            background: 'red',
-                                            border: 'none',
-                                            padding: '9px',
-                                            borderRadius: '10px',
-                                        }}
-                                    >
-                                        Excluir
-                                    </button>
-                                </Td>
+                {loading ? (
+                    <p>Carregando produtos...</p>
+                ) : (
+                    <Table>
+                        <Thead>
+                            <tr>
+                                <Th>Nome do Peixe</Th>
+                                <Th>Quantidade (kg)</Th>
+                                <Th>Preço por kg (R$)</Th>
+                                <Th>Ações</Th>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            )}
+                        </Thead>
+                        <tbody>
+                            {produtos.map(produto => (
+                                <tr key={produto._id}>
+                                    <Td>{produto.name}</Td>
+                                    <Td>{produto.quantity}</Td>
+                                    <Td>{produto.pricePerKg.toFixed(2)}</Td>
+                                    <Td>
+                                        <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
+                                        <ActionButton
+                                            className="delete"
+                                            onClick={() => handleDelete(produto._id)}
+                                        >
+                                            Excluir
+                                        </ActionButton>
+                                    </Td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                )}
 
-            {modalOpen && (
-                <Overlay onClick={closeModal}>
-                    <ModalContainer onClick={e => e.stopPropagation()}>
-                        <ModalTitle>{editingId ? 'Editar Produto' : 'Adicionar Produto'}</ModalTitle>
-                        <Form onSubmit={handleSubmit}>
-                            <Input
-                                type="text"
-                                name="nome"
-                                placeholder="Nome do Peixe"
-                                value={form.nome}
-                                onChange={handleChange}
-                            />
-                            <Input
-                                type="number"
-                                name="quantidade"
-                                placeholder="Quantidade (kg)"
-                                value={form.quantidade}
-                                onChange={handleChange}
-                            />
-                            <Input
-                                type="number"
-                                step="0.01"
-                                name="preco"
-                                placeholder="Preço por kg (R$)"
-                                value={form.preco}
-                                onChange={handleChange}
-                            />
-                            <ButtonGroup>
-                                <Button isCancel type="button" onClick={closeModal}>
-                                    Cancelar
-                                </Button>
-                                <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>
-                            </ButtonGroup>
-                        </Form>
-                    </ModalContainer>
-                </Overlay>
-            )}
-        </EstoqueContainer>
+                {modalOpen && (
+                    <Overlay onClick={closeModal}>
+                        <ModalContainer onClick={e => e.stopPropagation()}>
+                            <ModalTitle>{editingId ? 'Editar Produto' : 'Adicionar Produto'}</ModalTitle>
+                            <Form onSubmit={handleSubmit}>
+                                <Input
+                                    type="text"
+                                    name="nome"
+                                    placeholder="Nome do Peixe"
+                                    value={form.nome}
+                                    onChange={handleChange}
+                                />
+                                <Input
+                                    type="number"
+                                    name="quantidade"
+                                    placeholder="Quantidade (kg)"
+                                    value={form.quantidade}
+                                    onChange={handleChange}
+                                />
+                                <Input
+                                    type="number"
+                                    step="0.01"
+                                    name="preco"
+                                    placeholder="Preço por kg (R$)"
+                                    value={form.preco}
+                                    onChange={handleChange}
+                                />
+                                <ButtonGroup>
+                                    <Button isCancel type="button" onClick={closeModal}>
+                                        Cancelar
+                                    </Button>
+                                    <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>
+                                </ButtonGroup>
+                            </Form>
+                        </ModalContainer>
+                    </Overlay>
+                )}
+            </EstoqueContainer>
+        </ContentContainer>
     );
 }
