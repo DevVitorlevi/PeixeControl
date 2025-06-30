@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 export const ContentContainer = styled.main`
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;       /* centraliza horizontalmente */
   padding: 0 16px;      /* espaçamento nas laterais, responsivo */
   width: 100%;

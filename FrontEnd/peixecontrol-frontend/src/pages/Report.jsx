@@ -10,9 +10,12 @@ import {
     ReportCard,
     ReportsList,
     ReportListItem,
+    ReportModalOverlay,
+    ReportModalContent
 } from '../styles/ReportStyles';
 
-import { ModalContent, ModalOverlay, CartList, CartItem } from '../styles/SalesStyles';
+
+import { CartList, CartItem } from '../styles/SalesStyles';
 
 
 export default function Reports() {

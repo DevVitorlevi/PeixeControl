@@ -33,7 +33,6 @@ export default function Sidebar() {
                     <X size={28} />
                 </CloseButton>
 
-                <StyledLink to="/dashboard" onClick={closeSidebar}>Dashboard</StyledLink>
                 <StyledLink to="/estoque" onClick={closeSidebar}>Estoque</StyledLink>
                 <StyledLink to="/vendas" onClick={closeSidebar}>Vendas</StyledLink>
                 <StyledLink to="/relatorios" onClick={closeSidebar}>Relatórios</StyledLink>
