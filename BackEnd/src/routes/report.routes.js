@@ -9,8 +9,8 @@ router.use(auth);
 router.get('/sales-summary', ReportController.salesSummary);
 router.get('/top-products', ReportController.topProducts);
 router.get('/low-stock', ReportController.lowStock);
-router.get('/profit-summary', ReportController.profitSummary); 
-router.get('/stock-alert', ReportController.stockAlert); 
+router.get('/profit-summary', ReportController.profitSummary);
+router.get('/stock-alert', ReportController.stockAlert);
 router.get('/sales-history', ReportController.salesHistory);
 
 module.exports = router;

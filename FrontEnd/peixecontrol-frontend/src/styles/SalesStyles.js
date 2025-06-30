@@ -79,19 +79,20 @@ export const CartList = styled.ul`
 
 export const CartItem = styled.li`
   background-color: #f9f9f9;
-  padding: 35px;
+  padding: 20px 25px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 1.6rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1.4rem;
+  color: #34495e;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #ecf0f1;
+    background-color: #e9f0f7;
   }
 `;
 
