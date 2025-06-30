@@ -1,10 +1,13 @@
 import styled from 'styled-components';
 
-export const ContentContainer = styled.div`
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 30px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+export const ContentContainer = styled.main`
+  max-width: 1200px;
+  margin: 0 auto;       /* centraliza horizontalmente */
+  padding: 0 16px;      /* espaçamento nas laterais, responsivo */
+  width: 100%;
+  box-sizing: border-box;
+
+  @media (min-width: 769px) {
+    padding-left: 20px; /* espaço para sidebar desktop */
+  }
 `;
