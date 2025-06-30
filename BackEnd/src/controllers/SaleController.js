@@ -44,6 +44,7 @@ module.exports = {
             // Atualiza dados no item
             item.productName = product.name;
             item.pricePerKg = product.pricePerKg;
+            item.costPerKg = product.costPerKg; // ✅ NOVO
 
             total += product.pricePerKg * quantitySold;
         }

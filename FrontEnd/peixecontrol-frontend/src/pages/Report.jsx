@@ -1,29 +1,61 @@
 import React, { useEffect, useState } from 'react';
 import api from '../services/api';
+import { toast } from 'react-toastify';
 import { ContentContainer } from '../styles/ContentContainer';
 import {
     ReportsContainer,
     Title,
     ReportCard,
     ReportsList,
-    ReportListItem
+    ReportListItem,
+    FilterContainer,
+    FilterButton,
+    AlertCard,
+    CartList,
+    CartItem,
+    ModalOverlay,
+    ModalContent
 } from '../styles/ReportStyles';
 
 export default function Reports() {
-    const [salesDay, setSalesDay] = useState(null);
+    const [salesSummary, setSalesSummary] = useState(null);
     const [topProducts, setTopProducts] = useState([]);
     const [lowStock, setLowStock] = useState([]);
+    const [profit, setProfit] = useState(null);
+    const [salesHistory, setSalesHistory] = useState([]);
+    const [selectedSale, setSelectedSale] = useState(null);
+    const [filter, setFilter] = useState('day');
 
+    // Alerta contínuo
     useEffect(() => {
-        fetchSalesDay();
-        fetchTopProducts();
-        fetchLowStock();
+        const interval = setInterval(async () => {
+            try {
+                const res = await api.get('/reports/low-stock');
+                if (res.data.length > 0) {
+                    res.data.forEach(product => {
+                        toast.warn(`Estoque baixo: ${product.name} (${product.quantity} kg restantes)`);
+                    });
+                }
+            } catch {
+                console.error('Erro ao verificar estoque baixo');
+            }
+        }, 300000); // 5 min
+
+        return () => clearInterval(interval);
     }, []);
 
-    async function fetchSalesDay() {
+    useEffect(() => {
+        fetchSalesSummary();
+        fetchTopProducts();
+        fetchLowStock();
+        fetchProfit();
+        fetchSalesHistory();
+    }, [filter]);
+
+    async function fetchSalesSummary() {
         try {
-            const res = await api.get('/reports/sales-summary?period=day');
-            setSalesDay(res.data);
+            const res = await api.get(`/reports/sales-summary?period=${filter}`);
+            setSalesSummary(res.data);
         } catch {
             alert('Erro ao carregar resumo de vendas');
         }
@@ -47,25 +79,75 @@ export default function Reports() {
         }
     }
 
+    async function fetchProfit() {
+        try {
+            const res = await api.get('/reports/profit-summary');
+            setProfit(res.data.totalProfit);
+        } catch {
+            alert('Erro ao calcular lucro');
+        }
+    }
+
+    async function fetchSalesHistory() {
+        try {
+            const res = await api.get(`/reports/sales-history?period=${filter}`);
+            setSalesHistory(res.data);
+        } catch {
+            alert('Erro ao carregar histórico de vendas');
+        }
+    }
+
+    function handleOpenModal(sale) {
+        setSelectedSale(sale);
+    }
+
+    function handleCloseModal() {
+        setSelectedSale(null);
+    }
+
     return (
         <ContentContainer>
             <ReportsContainer>
-                <Title>Resumo das Vendas Hoje</Title>
-                {salesDay ? (
+                <Title>Relatórios de Vendas</Title>
+
+                {/* Filtros */}
+                <FilterContainer>
+                    <FilterButton onClick={() => setFilter('day')} $active={filter === 'day'}>
+                        Dia
+                    </FilterButton>
+                    <FilterButton onClick={() => setFilter('week')} $active={filter === 'week'}>
+                        Semana
+                    </FilterButton>
+                    <FilterButton onClick={() => setFilter('month')} $active={filter === 'month'}>
+                        Mês
+                    </FilterButton>
+                    <FilterButton onClick={() => setFilter('all')} $active={filter === 'all'}>
+                        Histórico
+                    </FilterButton>
+                </FilterContainer>
+
+                {/* Resumo de Vendas */}
+                {salesSummary ? (
                     <ReportCard>
-                        <p>Total Vendido: R$ {salesDay.totalSalesValue.toFixed(2)}</p>
-                        <p>Quantidade Vendida: {salesDay.totalQuantity} kg</p>
+                        <p><strong>Total Vendido:</strong> R$ {salesSummary.totalSalesValue?.toFixed(2) || '0.00'}</p>
+                        <p><strong>Quantidade Vendida:</strong> {salesSummary.totalQuantity ?? 0} kg</p>
                     </ReportCard>
                 ) : (
-                    <p>Carregando...</p>
+                    <p>Carregando resumo...</p>
                 )}
 
+                {/* Lucro */}
+                <ReportCard>
+                    <p><strong>Lucro Total:</strong> R$ {profit != null ? profit.toFixed(2) : '0.00'}</p>
+                </ReportCard>
+
+                {/* Produtos Mais Vendidos */}
                 <Title>Produtos Mais Vendidos</Title>
                 <ReportsList>
                     {topProducts.length > 0 ? (
                         topProducts.map(prod => (
                             <ReportListItem key={prod._id}>
-                                {prod.productName} — {prod.totalQuantity} kg — R$ {prod.totalSalesValue.toFixed(2)}
+                                {prod.productName} — {prod.totalQuantity} kg — R$ {prod.totalSalesValue?.toFixed(2) || '0.00'}
                             </ReportListItem>
                         ))
                     ) : (
@@ -73,6 +155,7 @@ export default function Reports() {
                     )}
                 </ReportsList>
 
+                {/* Estoque Baixo */}
                 <Title>Produtos com Estoque Baixo</Title>
                 <ReportsList>
                     {lowStock.length > 0 ? (
@@ -85,6 +168,41 @@ export default function Reports() {
                         <p>Nenhum produto com estoque baixo</p>
                     )}
                 </ReportsList>
+
+                {/* Histórico Visual */}
+                <Title>Histórico de Vendas</Title>
+                <CartList>
+                    {salesHistory.length > 0 ? (
+                        salesHistory.map((sale, index) => (
+                            <CartItem key={index} onClick={() => handleOpenModal(sale)}>
+                                <span>Venda de {sale.items.length} item(s)</span>
+                                <span>R$ {sale.total.toFixed(2)}</span>
+                                <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
+                            </CartItem>
+                        ))
+                    ) : (
+                        <p>Nenhuma venda registrada</p>
+                    )}
+                </CartList>
+
+                {/* Modal Detalhado */}
+                {selectedSale && (
+                    <ModalOverlay onClick={handleCloseModal}>
+                        <ModalContent onClick={(e) => e.stopPropagation()}>
+                            <h2>Detalhes da Venda</h2>
+                            <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
+                            <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
+                            <ul>
+                                {selectedSale.items.map((item, idx) => (
+                                    <li key={idx}>
+                                        {item.productName} — {item.quantitySold} kg — R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                                    </li>
+                                ))}
+                            </ul>
+                            <p><strong>Total: R$ {selectedSale.total.toFixed(2)}</strong></p>
+                        </ModalContent>
+                    </ModalOverlay>
+                )}
             </ReportsContainer>
         </ContentContainer>
     );

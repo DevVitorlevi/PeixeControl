@@ -20,4 +20,6 @@ router.patch('/:id', ProductController.update);
 // Deletar produto
 router.delete('/:id', ProductController.delete);
 
+router.get('/low-stock-alert', ProductController.lowStockAlert);
+
 module.exports = router;

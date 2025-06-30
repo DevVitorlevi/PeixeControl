@@ -63,5 +63,14 @@ module.exports = {
         }
 
         return res.json({ message: 'Produto deletado com sucesso!' });
+    },
+
+        async lowStockAlert(req, res) {
+        try {
+            const lowStock = await Product.find({ userId: req.userId, quantity: { $lte: 5 } });
+            return res.json(lowStock);
+        } catch (error) {
+            return res.status(500).json({ message: 'Erro ao buscar alerta de estoque baixo' });
+        }
     }
 };

@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const ProductSchema = new mongoose.Schema({
@@ -12,6 +11,10 @@ const ProductSchema = new mongoose.Schema({
         required: true
     },
     pricePerKg: {
+        type: Number,
+        required: true
+    },
+    costPerKg: { // ✅ NOVO
         type: Number,
         required: true
     },
