@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import Header from '../components/Header';
 import Sidebar from '../components/SideBar';
 import Estoque from '../pages/Estoque';
+import Sales from '../pages/Sales'
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -58,6 +59,16 @@ export default function AppRoutes() {
                         <PrivateRoute>
                             <PrivateLayout>
                                 <Estoque />
+                            </PrivateLayout>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/vendas"
+                    element={
+                        <PrivateRoute>
+                            <PrivateLayout>
+                                <Sales />
                             </PrivateLayout>
                         </PrivateRoute>
                     }
