@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/product.routes');
 const saleRoutes = require('./routes/sale.routes')
 const userRoutes = require('./routes/user.routes');
+const reportRoutes = require('./routes/report.routes');
 
 
 
@@ -18,6 +19,7 @@ app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
 app.use('/sales', saleRoutes)
 app.use('/users', userRoutes);
+app.use('/reports', reportRoutes);
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URL)

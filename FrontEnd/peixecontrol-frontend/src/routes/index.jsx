@@ -5,7 +5,8 @@ import Dashboard from '../pages/Dashboard';
 import Header from '../components/Header';
 import Sidebar from '../components/SideBar';
 import Estoque from '../pages/Estoque';
-import Sales from '../pages/Sales'
+import Sales from '../pages/Sales';
+import Reports from '../pages/Report';
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 
@@ -24,14 +25,13 @@ function PrivateRoute({ children }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Espera token carregar (que inicialmente é undefined)
         if (token !== undefined) {
             setLoading(false);
         }
     }, [token]);
 
     if (loading) {
-        return <div>Carregando...</div>; // Pode substituir por um spinner bonito
+        return <div>Carregando...</div>; // Pode personalizar com um spinner
     }
 
     return token ? children : <Navigate to="/" />;
@@ -43,6 +43,7 @@ export default function AppRoutes() {
             <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+
                 <Route
                     path="/dashboard"
                     element={
@@ -53,6 +54,7 @@ export default function AppRoutes() {
                         </PrivateRoute>
                     }
                 />
+
                 <Route
                     path="/estoque"
                     element={
@@ -63,12 +65,24 @@ export default function AppRoutes() {
                         </PrivateRoute>
                     }
                 />
+
                 <Route
                     path="/vendas"
                     element={
                         <PrivateRoute>
                             <PrivateLayout>
                                 <Sales />
+                            </PrivateLayout>
+                        </PrivateRoute>
+                    }
+                />
+
+                <Route
+                    path="/relatorios"
+                    element={
+                        <PrivateRoute>
+                            <PrivateLayout>
+                                <Reports />
                             </PrivateLayout>
                         </PrivateRoute>
                     }
