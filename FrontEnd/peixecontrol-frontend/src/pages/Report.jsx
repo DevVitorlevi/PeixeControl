@@ -7,7 +7,6 @@ import { ContentContainer } from '../styles/ContentContainer';
 import {
     ReportsContainer,
     Title,
-    ReportCard,
     ReportsList,
     ReportListItem,
     ReportModalOverlay,
@@ -18,7 +17,6 @@ import { CartList, CartItem } from '../styles/SalesStyles';
 
 export default function Reports() {
     const [salesSummary, setSalesSummary] = useState(null);
-    const [topProducts, setTopProducts] = useState([]);
     const [lowStock, setLowStock] = useState([]);
     const [salesHistory, setSalesHistory] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
@@ -46,7 +44,6 @@ export default function Reports() {
 
     useEffect(() => {
         fetchSalesSummary();
-        fetchTopProducts();
         fetchLowStock();
         fetchSalesHistory();
     }, [selectedDate]);
@@ -71,16 +68,7 @@ export default function Reports() {
             const res = await api.get(`/reports/sales-summary?date=${selectedDate.toISOString().split('T')[0]}`);
             setSalesSummary(res.data);
         } catch {
-            alert('Erro ao carregar resumo de vendas');
-        }
-    }
-
-    async function fetchTopProducts() {
-        try {
-            const res = await api.get('/reports/top-products');
-            setTopProducts(res.data);
-        } catch {
-            alert('Erro ao carregar produtos mais vendidos');
+            toast.error('Erro ao carregar resumo de vendas');
         }
     }
 
@@ -89,7 +77,7 @@ export default function Reports() {
             const res = await api.get('/reports/low-stock');
             setLowStock(res.data);
         } catch {
-            alert('Erro ao carregar produtos com estoque baixo');
+            toast.error('Erro ao carregar produtos com estoque baixo');
         }
     }
 
@@ -98,7 +86,7 @@ export default function Reports() {
             const res = await api.get(`/reports/sales-history?date=${selectedDate.toISOString().split('T')[0]}`);
             setSalesHistory(res.data);
         } catch {
-            alert('Erro ao carregar histórico de vendas');
+            toast.error('Erro ao carregar histórico de vendas');
         }
     }
 
@@ -136,19 +124,6 @@ export default function Reports() {
                     dateFormat="dd/MM/yyyy"
                     inline
                 />
-
-                <Title>Produtos Mais Vendidos</Title>
-                <ReportsList>
-                    {topProducts.length > 0 ? (
-                        topProducts.map(prod => (
-                            <ReportListItem key={prod._id}>
-                                {prod.productName} — {prod.totalQuantity} kg — R$ {prod.totalSalesValue?.toFixed(2) || '0.00'}
-                            </ReportListItem>
-                        ))
-                    ) : (
-                        <p>Nenhum produto encontrado</p>
-                    )}
-                </ReportsList>
 
                 <Title>Produtos com Estoque Baixo</Title>
                 <ReportsList>

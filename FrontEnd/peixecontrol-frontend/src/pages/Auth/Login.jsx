@@ -79,7 +79,7 @@ export const Login = () => {
                 setFormData({ email: '', password: '' });
 
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    navigate('/estoque');
                 }, 1500);
 
             } catch (error) {

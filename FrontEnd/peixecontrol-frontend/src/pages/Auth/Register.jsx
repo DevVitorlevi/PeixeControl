@@ -131,7 +131,7 @@ export const Register = () => {
                 inputNameRef.current?.focus();
 
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    navigate('/estoque');
                 }, 1500);
             } catch (err) {
                 const errorMsg =
