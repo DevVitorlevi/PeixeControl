@@ -66,16 +66,18 @@ export const ButtonGroup = styled.div`
 `;
 
 export const Button = styled.button`
+  background-color: ${({ $isCancel }) => ($isCancel ? '#c0392b' : '#27ae60')};
+  color: white;
   padding: 10px 20px;
-  background-color: ${props => (props.isCancel ? '#ccc' : '#007bff')};
-  color: ${props => (props.isCancel ? '#333' : '#fff')};
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 600;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
 
   &:hover {
-    background-color: ${props => (props.isCancel ? '#bbb' : '#0056b3')};
+    background-color: ${({ $isCancel }) => ($isCancel ? '#89231d' : '#1e8449')};
   }
 `;
+

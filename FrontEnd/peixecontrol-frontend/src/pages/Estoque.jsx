@@ -29,7 +29,7 @@ export default function Estoque() {
     const [loading, setLoading] = useState(false);
 
     const [modalOpen, setModalOpen] = useState(false);
-    const [form, setForm] = useState({ nome: '', quantidade: '', preco: '', custo: '' });
+    const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
 
     async function fetchProdutos() {
@@ -49,7 +49,7 @@ export default function Estoque() {
     }, []);
 
     function openAddModal() {
-        setForm({ nome: '', quantidade: '', preco: '', custo: '' });
+        setForm({ nome: '', quantidade: '', preco: '' });
         setEditingId(null);
         setModalOpen(true);
     }
@@ -59,7 +59,6 @@ export default function Estoque() {
             nome: produto.name,
             quantidade: produto.quantity,
             preco: produto.pricePerKg,
-            custo: produto.costPerKg || '',
         });
         setEditingId(produto._id);
         setModalOpen(true);
@@ -84,7 +83,6 @@ export default function Estoque() {
 
         const quantidadeNum = Number(form.quantidade);
         const precoNum = Number(form.preco);
-        const custoNum = Number(form.custo);
 
         if (!quantidadeNum || quantidadeNum <= 0) {
             toast.error('Quantidade deve ser maior que zero');
@@ -96,16 +94,10 @@ export default function Estoque() {
             return;
         }
 
-        if (!custoNum || custoNum <= 0) {
-            toast.error('Custo deve ser maior que zero');
-            return;
-        }
-
         const produtoEnviado = {
             name: form.nome.trim(),
             quantity: quantidadeNum,
             pricePerKg: precoNum,
-            costPerKg: custoNum,
         };
 
         try {
@@ -150,7 +142,6 @@ export default function Estoque() {
                                 <Th>Nome do Peixe</Th>
                                 <Th>Quantidade (kg)</Th>
                                 <Th>Preço por kg (R$)</Th>
-                                <Th>Custo por kg (R$)</Th>
                                 <Th>Ações</Th>
                             </tr>
                         </Thead>
@@ -160,7 +151,6 @@ export default function Estoque() {
                                     <Td>{produto.name}</Td>
                                     <Td>{produto.quantity}</Td>
                                     <Td>{produto.pricePerKg.toFixed(2)}</Td>
-                                    <Td>{produto.costPerKg ? produto.costPerKg.toFixed(2) : '-'}</Td>
                                     <Td>
                                         <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
                                         <ActionButton
@@ -203,16 +193,8 @@ export default function Estoque() {
                                     value={form.preco}
                                     onChange={handleChange}
                                 />
-                                <Input
-                                    type="number"
-                                    step="0.01"
-                                    name="custo"
-                                    placeholder="Custo por kg (R$)"
-                                    value={form.custo}
-                                    onChange={handleChange}
-                                />
                                 <ButtonGroup>
-                                    <Button isCancel type="button" onClick={closeModal}>
+                                    <Button $isCancel type="button" onClick={closeModal}>
                                         Cancelar
                                     </Button>
                                     <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>

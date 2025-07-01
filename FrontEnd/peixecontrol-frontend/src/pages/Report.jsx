@@ -20,7 +20,6 @@ export default function Reports() {
     const [salesSummary, setSalesSummary] = useState(null);
     const [topProducts, setTopProducts] = useState([]);
     const [lowStock, setLowStock] = useState([]);
-    const [profit, setProfit] = useState(null);
     const [salesHistory, setSalesHistory] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -46,7 +45,6 @@ export default function Reports() {
         fetchSalesSummary();
         fetchTopProducts();
         fetchLowStock();
-        fetchProfit();
         fetchSalesHistory();
     }, [selectedDate]);
 
@@ -74,15 +72,6 @@ export default function Reports() {
             setLowStock(res.data);
         } catch {
             alert('Erro ao carregar produtos com estoque baixo');
-        }
-    }
-
-    async function fetchProfit() {
-        try {
-            const res = await api.get('/reports/profit-summary');
-            setProfit(res.data.totalProfit);
-        } catch {
-            alert('Erro ao calcular lucro');
         }
     }
 
@@ -124,10 +113,6 @@ export default function Reports() {
                     dateFormat="dd/MM/yyyy"
                     inline
                 />
-
-                <ReportCard>
-                    <p><strong>Lucro Total:</strong> R$ {profit != null ? profit.toFixed(2) : '0.00'}</p>
-                </ReportCard>
 
                 <Title>Produtos Mais Vendidos</Title>
                 <ReportsList>

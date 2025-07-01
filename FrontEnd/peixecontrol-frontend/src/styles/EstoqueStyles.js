@@ -84,18 +84,22 @@ export const ActionButton = styled.button`
   cursor: pointer;
   margin-left: 10px;
   font-weight: 700;
-  color: #2980b9;
-  transition: color 0.3s ease;
-
+  background-color: #2980b9;
+  color: white;
+  transition: .5s ease;
+  padding: .4rem;
+  border: 0;
+  border-radius: .6rem;
   &:hover {
-    color: #1c5980;
+    background-color: #1c5980;
   }
 
   &.delete {
-    color: #c0392b;
+    background-color: red;
+    color:#ffffff;
 
     &:hover {
-      color: #89231d;
+      background-color: #89231d;
     }
   }
 `;
