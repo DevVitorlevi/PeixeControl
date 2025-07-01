@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     EstoqueContainer,
     Title,
@@ -8,7 +8,7 @@ import {
     Td,
     ButtonAdd,
     ActionButton,
-    SearchInput
+    SearchInput,
 } from '../styles/EstoqueStyles';
 
 import {
@@ -28,12 +28,13 @@ import { toast } from 'react-toastify';
 export default function Estoque() {
     const [produtos, setProdutos] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const [modalOpen, setModalOpen] = useState(false);
     const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
 
-    const [searchTerm, setSearchTerm] = useState('');
+    const toastIdsRef = useRef(new Set());
 
     async function fetchProdutos() {
         try {
@@ -47,8 +48,36 @@ export default function Estoque() {
         }
     }
 
+    async function checkLowStock() {
+        try {
+            const res = await api.get('/reports/low-stock');
+            if (res.data.length > 0) {
+                res.data.forEach(produto => {
+                    if (!toastIdsRef.current.has(produto._id)) {
+                        toast.warn(`Estoque baixo: ${produto.name} (${produto.quantity} kg restantes)`, {
+                            onClose: () => {
+                                toastIdsRef.current.delete(produto._id);
+                            },
+                            autoClose: 8000,
+                        });
+                        toastIdsRef.current.add(produto._id);
+                    }
+                });
+            }
+        } catch {
+            console.error('Erro ao verificar estoque baixo');
+        }
+    }
+
     useEffect(() => {
         fetchProdutos();
+        checkLowStock();
+
+        const intervalId = setInterval(() => {
+            checkLowStock();
+        }, 300000); // 5 minutos = 300000 ms
+
+        return () => clearInterval(intervalId);
     }, []);
 
     function openAddModal() {
@@ -130,7 +159,6 @@ export default function Estoque() {
         }
     }
 
-    // Lógica de filtro
     const produtosFiltrados = produtos.filter(produto =>
         produto.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -143,11 +171,10 @@ export default function Estoque() {
 
                 <SearchInput
                     type="text"
-                    placeholder="Pesquisar produto pelo nome..."
+                    placeholder="Pesquisar peixe..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
-
 
                 {loading ? (
                     <p>Carregando produtos...</p>
@@ -181,7 +208,9 @@ export default function Estoque() {
                                 ))
                             ) : (
                                 <tr>
-                                    <Td colSpan="4" style={{ textAlign: 'center' }}>Nenhum produto encontrado</Td>
+                                    <Td colSpan={4} style={{ textAlign: 'center' }}>
+                                        Nenhum peixe encontrado.
+                                    </Td>
                                 </tr>
                             )}
                         </tbody>
@@ -199,6 +228,7 @@ export default function Estoque() {
                                     placeholder="Nome do Peixe"
                                     value={form.nome}
                                     onChange={handleChange}
+                                    required
                                 />
                                 <Input
                                     type="number"
@@ -206,6 +236,7 @@ export default function Estoque() {
                                     placeholder="Quantidade (kg)"
                                     value={form.quantidade}
                                     onChange={handleChange}
+                                    required
                                 />
                                 <Input
                                     type="number"
@@ -214,6 +245,7 @@ export default function Estoque() {
                                     placeholder="Preço por kg (R$)"
                                     value={form.preco}
                                     onChange={handleChange}
+                                    required
                                 />
                                 <ButtonGroup>
                                     <Button $isCancel type="button" onClick={closeModal}>
