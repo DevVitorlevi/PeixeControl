@@ -146,25 +146,40 @@ export const SearchButton = styled.button`
 
 export const ReportModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.7);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 `;
 
 export const ReportModalContent = styled.div`
-  background-color: #ffffff;
+  background-color: #fff;
   padding: 30px;
   border-radius: 15px;
   width: 90%;
   max-width: 700px;
   position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   h2 {
     margin-bottom: 20px;
@@ -193,6 +208,7 @@ export const ReportModalContent = styled.div`
     color: rgb(49, 107, 231);
   }
 `;
+
 export const DailySummaryCard = styled.div`
   background-color: #e8f5e9; /* Verde bem claro */
   border: 2px solid #2ecc71; /* Verde vivo para borda */

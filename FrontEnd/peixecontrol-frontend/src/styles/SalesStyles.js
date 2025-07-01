@@ -152,6 +152,15 @@ export const ModalOverlay = styled.div`
   align-items: center;
   z-index: 9999;
 
+  /* Start hidden */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
 `;
 
 export const ModalContent = styled.div`
@@ -162,6 +171,15 @@ export const ModalContent = styled.div`
   max-width: 700px;
   position: relative;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+
+  opacity: 0;
+  transform: translateY(-30px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+  &.open {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   h3 {
     margin-bottom: 20px;
@@ -179,7 +197,7 @@ export const ModalContent = styled.div`
   li {
     margin-bottom: 10px;
     font-size: 1.5rem;
-    color:rgb(245, 193, 7);
+    color: rgb(245, 193, 7);
     font-weight: bold;
   }
 
@@ -187,7 +205,7 @@ export const ModalContent = styled.div`
     margin-bottom: 10px;
     font-weight: bold;
     font-size: 1.8rem;
-    color:rgb(49, 107, 231);
+    color: rgb(49, 107, 231);
   }
 `;
 

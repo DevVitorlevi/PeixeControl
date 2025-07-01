@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import ReactDatePicker from 'react-datepicker';
@@ -24,6 +24,9 @@ export default function Reports() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
 
+    const overlayRef = useRef(null);
+    const contentRef = useRef(null);
+
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
@@ -47,6 +50,21 @@ export default function Reports() {
         fetchLowStock();
         fetchSalesHistory();
     }, [selectedDate]);
+
+    useEffect(() => {
+        if (selectedSale) {
+            if (overlayRef.current && contentRef.current) {
+                void overlayRef.current.offsetWidth; // força reflow
+                overlayRef.current.classList.add('open');
+                contentRef.current.classList.add('open');
+            }
+        } else {
+            if (overlayRef.current && contentRef.current) {
+                overlayRef.current.classList.remove('open');
+                contentRef.current.classList.remove('open');
+            }
+        }
+    }, [selectedSale]);
 
     async function fetchSalesSummary() {
         try {
@@ -89,7 +107,12 @@ export default function Reports() {
     }
 
     function handleCloseModal() {
-        setSelectedSale(null);
+        if (overlayRef.current && contentRef.current) {
+            contentRef.current.classList.remove('open');
+            overlayRef.current.classList.remove('open');
+
+            setTimeout(() => setSelectedSale(null), 300);
+        }
     }
 
     const dailyTotals = salesHistory.reduce(
@@ -164,8 +187,8 @@ export default function Reports() {
                 )}
 
                 {selectedSale && (
-                    <ReportModalOverlay onClick={handleCloseModal}>
-                        <ReportModalContent onClick={(e) => e.stopPropagation()}>
+                    <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>
+                        <ReportModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>
                             <h2>Detalhes da Venda</h2>
                             <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
                             <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>

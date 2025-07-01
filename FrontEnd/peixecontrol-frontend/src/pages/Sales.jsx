@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import {
@@ -29,10 +29,31 @@ export default function Sales() {
 
     const [selectedSale, setSelectedSale] = useState(null);
 
+    const overlayRef = useRef(null);
+    const contentRef = useRef(null);
+
     useEffect(() => {
         fetchProducts();
         fetchSales();
     }, []);
+
+    useEffect(() => {
+        if (selectedSale) {
+            // Abre modal com transição
+            if (overlayRef.current && contentRef.current) {
+                // Forçar reflow para garantir animação (opcional)
+                void overlayRef.current.offsetWidth;
+                overlayRef.current.classList.add('open');
+                contentRef.current.classList.add('open');
+            }
+        } else {
+            // Fecha modal com transição
+            if (overlayRef.current && contentRef.current) {
+                contentRef.current.classList.remove('open');
+                overlayRef.current.classList.remove('open');
+            }
+        }
+    }, [selectedSale]);
 
     async function fetchProducts() {
         try {
@@ -126,7 +147,14 @@ export default function Sales() {
     }
 
     function closeModal() {
-        setSelectedSale(null);
+        if (overlayRef.current && contentRef.current) {
+            // Iniciar animação de fechamento
+            contentRef.current.classList.remove('open');
+            overlayRef.current.classList.remove('open');
+
+            // Após 300ms remove o modal do DOM
+            setTimeout(() => setSelectedSale(null), 300);
+        }
     }
 
     return (
@@ -188,8 +216,8 @@ export default function Sales() {
             </SalesContainer>
 
             {selectedSale && (
-                <ModalOverlay onClick={closeModal}>
-                    <ModalContent onClick={e => e.stopPropagation()}>
+                <ModalOverlay ref={overlayRef} onClick={closeModal}>
+                    <ModalContent ref={contentRef} onClick={e => e.stopPropagation()}>
                         <CloseButton onClick={closeModal}>X</CloseButton>
                         <h3>Detalhes da Venda</h3>
                         <ul>
