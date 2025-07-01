@@ -95,7 +95,7 @@ export const CartItem = styled.li`
   font-size: 1.4rem;
   color:rgb(255, 255, 255);
   transition: background-color 0.3s;
-  width: 60vw;
+  width: 40vw;
   &:hover {
     background-color:rgb(24, 118, 212);
   }

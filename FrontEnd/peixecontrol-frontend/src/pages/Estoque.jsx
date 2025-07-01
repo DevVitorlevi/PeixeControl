@@ -8,6 +8,7 @@ import {
     Td,
     ButtonAdd,
     ActionButton,
+    SearchInput
 } from '../styles/EstoqueStyles';
 
 import {
@@ -31,6 +32,8 @@ export default function Estoque() {
     const [modalOpen, setModalOpen] = useState(false);
     const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
+
+    const [searchTerm, setSearchTerm] = useState('');
 
     async function fetchProdutos() {
         try {
@@ -127,11 +130,24 @@ export default function Estoque() {
         }
     }
 
+    // Lógica de filtro
+    const produtosFiltrados = produtos.filter(produto =>
+        produto.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
         <ContentContainer>
             <EstoqueContainer>
                 <Title>Estoque</Title>
                 <ButtonAdd onClick={openAddModal}>+ Adicionar Produto</ButtonAdd>
+
+                <SearchInput
+                    type="text"
+                    placeholder="Pesquisar produto pelo nome..."
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
+
 
                 {loading ? (
                     <p>Carregando produtos...</p>
@@ -146,22 +162,28 @@ export default function Estoque() {
                             </tr>
                         </Thead>
                         <tbody>
-                            {produtos.map(produto => (
-                                <tr key={produto._id}>
-                                    <Td>{produto.name}</Td>
-                                    <Td>{produto.quantity}</Td>
-                                    <Td>{produto.pricePerKg.toFixed(2)}</Td>
-                                    <Td>
-                                        <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
-                                        <ActionButton
-                                            className="delete"
-                                            onClick={() => handleDelete(produto._id)}
-                                        >
-                                            Excluir
-                                        </ActionButton>
-                                    </Td>
+                            {produtosFiltrados.length > 0 ? (
+                                produtosFiltrados.map(produto => (
+                                    <tr key={produto._id}>
+                                        <Td>{produto.name}</Td>
+                                        <Td>{produto.quantity}</Td>
+                                        <Td>{produto.pricePerKg.toFixed(2)}</Td>
+                                        <Td>
+                                            <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
+                                            <ActionButton
+                                                className="delete"
+                                                onClick={() => handleDelete(produto._id)}
+                                            >
+                                                Excluir
+                                            </ActionButton>
+                                        </Td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <Td colSpan="4" style={{ textAlign: 'center' }}>Nenhum produto encontrado</Td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </Table>
                 )}

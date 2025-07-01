@@ -103,3 +103,20 @@ export const ActionButton = styled.button`
     }
   }
 `;
+
+export const SearchInput = styled.input`
+  padding: 12px;
+  width: 100%;
+  max-width: 400px;
+  border: 1px solid #bdc3c7;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin: 20px auto;
+  display: block;
+  transition: border-color 0.3s;
+
+  &:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+`;
