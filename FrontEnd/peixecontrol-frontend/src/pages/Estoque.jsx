@@ -25,6 +25,9 @@ import { ContentContainer } from '../styles/ContentContainer';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 
+// 🔊 Som de alerta
+const beepSound = new Audio('/sounds/notify.mp3'); // coloque o som na pasta public/sounds/beep.mp3
+
 export default function Estoque() {
     const [produtos, setProdutos] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -54,6 +57,9 @@ export default function Estoque() {
             if (res.data.length > 0) {
                 res.data.forEach(produto => {
                     if (!toastIdsRef.current.has(produto._id)) {
+                        // 🔊 Tocar som de alerta
+                        beepSound.play();
+
                         toast.warn(`Estoque baixo: ${produto.name} (${produto.quantity} kg restantes)`, {
                             onClose: () => {
                                 toastIdsRef.current.delete(produto._id);

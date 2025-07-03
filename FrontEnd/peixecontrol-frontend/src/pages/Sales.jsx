@@ -32,6 +32,9 @@ export default function Sales() {
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
 
+    // Criar objeto Audio para som da venda
+    const saleSound = useRef(new Audio('/sounds/DIN.mp3')).current;
+
     useEffect(() => {
         fetchProducts();
         fetchSales();
@@ -39,15 +42,12 @@ export default function Sales() {
 
     useEffect(() => {
         if (selectedSale) {
-            // Abre modal com transição
             if (overlayRef.current && contentRef.current) {
-                // Forçar reflow para garantir animação (opcional)
                 void overlayRef.current.offsetWidth;
                 overlayRef.current.classList.add('open');
                 contentRef.current.classList.add('open');
             }
         } else {
-            // Fecha modal com transição
             if (overlayRef.current && contentRef.current) {
                 contentRef.current.classList.remove('open');
                 overlayRef.current.classList.remove('open');
@@ -142,17 +142,25 @@ export default function Sales() {
         }
     }
 
+    // Função que toca o som E chama o submit
+    function handleClickFinalizar(e) {
+        // Tocar som na interação direta do clique
+        saleSound.play().catch(() => {
+            // Se não der pra tocar, ignora o erro
+        });
+
+        // Depois chama o submit do form
+        handleRegisterSale(e);
+    }
+
     function handleSaleClick(sale) {
         setSelectedSale(sale);
     }
 
     function closeModal() {
         if (overlayRef.current && contentRef.current) {
-            // Iniciar animação de fechamento
             contentRef.current.classList.remove('open');
             overlayRef.current.classList.remove('open');
-
-            // Após 300ms remove o modal do DOM
             setTimeout(() => setSelectedSale(null), 300);
         }
     }
@@ -199,7 +207,8 @@ export default function Sales() {
                         <option value="Dinheiro">Dinheiro</option>
                     </Select>
 
-                    <Button type="submit">Finalizar Venda</Button>
+                    {/* Aqui o botão finaliza venda com som */}
+                    <Button type="submit" onClick={handleClickFinalizar}>Finalizar Venda</Button>
                 </Form>
 
                 <Title>Vendas do Dia</Title>
