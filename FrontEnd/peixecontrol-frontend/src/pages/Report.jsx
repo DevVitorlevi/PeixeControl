@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
-import ReactDatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { ContentContainer } from '../styles/ContentContainer';
 import {
     ReportsContainer,
@@ -140,24 +138,30 @@ export default function Reports() {
 
                 <GridContainer>
 
+                    {/* Calendário Pequeno - Data */}
                     <Card>
                         <Title>Selecionar Data</Title>
-                        <ReactDatePicker
-                            selected={selectedDate}
-                            onChange={(date) => setSelectedDate(date)}
-                            dateFormat="dd/MM/yyyy"
-                            inline
+                        <input
+                            type="date"
+                            value={selectedDate.toISOString().split('T')[0]}
+                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                            max={new Date().toISOString().split('T')[0]}
+                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                         />
                     </Card>
 
+                    {/* Calendário Pequeno - Mês */}
                     <Card>
                         <Title>Selecionar Mês</Title>
-                        <ReactDatePicker
-                            selected={selectedMonth}
-                            onChange={(date) => setSelectedMonth(date)}
-                            dateFormat="MM/yyyy"
-                            showMonthYearPicker
-                            inline
+                        <input
+                            type="month"
+                            value={`${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}`}
+                            onChange={(e) => {
+                                const [year, month] = e.target.value.split('-');
+                                setSelectedMonth(new Date(year, month - 1));
+                            }}
+                            max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
+                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                         />
                         {monthlySummary && (
                             <MonthSummaryCard>
@@ -168,6 +172,7 @@ export default function Reports() {
                         )}
                     </Card>
 
+                    {/* Estoque Baixo */}
                     <Card>
                         <Title>Produtos com Estoque Baixo</Title>
                         <ReportsList>
@@ -183,6 +188,7 @@ export default function Reports() {
                         </ReportsList>
                     </Card>
 
+                    {/* Histórico do Dia */}
                     <FullWidthCard>
                         <Title>Vendas no Dia Selecionado</Title>
                         <CartList>
@@ -210,6 +216,7 @@ export default function Reports() {
 
                 </GridContainer>
 
+                {/* Modal Detalhado */}
                 {selectedSale && (
                     <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>
                         <ReportModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>

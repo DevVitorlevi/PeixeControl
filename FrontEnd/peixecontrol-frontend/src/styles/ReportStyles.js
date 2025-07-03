@@ -9,7 +9,7 @@ export const ReportsContainer = styled.div`
 `;
 
 export const Title = styled.h2`
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 20px;
@@ -84,6 +84,7 @@ export const DailySummaryCard = styled.div`
     margin-bottom: 10px;
   }
 `;
+
 export const MonthSummaryCard = styled.div`
   background-color: #e8f5e9;
   border: 2px solid #2ecc71;
@@ -173,15 +174,11 @@ export const ReportModalContent = styled.div`
 
 export const GridContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1300px;
   margin-bottom: 2rem;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 export const Card = styled.div`
@@ -193,6 +190,22 @@ export const Card = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
+  
+  input {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    width: 100%;
+    cursor: pointer;
+    transition: border-color 0.3s;
+
+    &:focus {
+      outline: none;
+      border-color: #2c3e50;
+    }
+  }
 `;
 
 export const FullWidthCard = styled(Card)`
@@ -200,8 +213,5 @@ export const FullWidthCard = styled(Card)`
 
   @media (max-width: 1120px) {
     grid-column: span 1;
-    
   }
 `;
-
-
