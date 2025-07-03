@@ -7,6 +7,7 @@ import Sales from '../pages/Sales';
 import Reports from '../pages/Report';
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
+import StockHistory from '../pages/StockHistory';
 
 function PrivateLayout({ children }) {
     return (
@@ -70,6 +71,16 @@ export default function AppRoutes() {
                         <PrivateRoute>
                             <PrivateLayout>
                                 <Reports />
+                            </PrivateLayout>
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/movimentacoes"
+                    element={
+                        <PrivateRoute>
+                            <PrivateLayout>
+                                <StockHistory />
                             </PrivateLayout>
                         </PrivateRoute>
                     }

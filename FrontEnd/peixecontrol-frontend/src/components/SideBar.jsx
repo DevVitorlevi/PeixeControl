@@ -36,6 +36,10 @@ export default function Sidebar() {
                 <StyledLink to="/estoque" onClick={closeSidebar}>Estoque</StyledLink>
                 <StyledLink to="/vendas" onClick={closeSidebar}>Vendas</StyledLink>
                 <StyledLink to="/relatorios" onClick={closeSidebar}>Relatórios</StyledLink>
+                <StyledLink to="/movimentacoes" onClick={closeSidebar}>
+                    Movimentações
+                </StyledLink>
+
             </SidebarContainer>
         </>
     );
