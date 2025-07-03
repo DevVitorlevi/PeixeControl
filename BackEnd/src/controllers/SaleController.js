@@ -1,5 +1,6 @@
 const Sale = require('../models/Sale');
 const Product = require('../models/Product');
+const StockMovement = require('../models/StockMovement');
 
 module.exports = {
     async create(req, res) {
@@ -44,9 +45,17 @@ module.exports = {
             // Atualiza dados no item
             item.productName = product.name;
             item.pricePerKg = product.pricePerKg;
-            item.costPerKg = product.costPerKg; // ✅ NOVO
 
             total += product.pricePerKg * quantitySold;
+
+            // Registrar saída no estoque
+            await StockMovement.create({
+                userId: req.userId,
+                productId: product._id,
+                productName: product.name,
+                type: 'Saída',
+                quantity: quantitySold
+            });
         }
 
         const sale = await Sale.create({

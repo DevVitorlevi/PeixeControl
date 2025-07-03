@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from '../pages/Auth/Login';
-import { Register } from '../pages/Auth/Register';
 import Header from '../components/Header';
 import Sidebar from '../components/SideBar';
 import Estoque from '../pages/Estoque';
@@ -41,7 +40,6 @@ export default function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/register" element={<Register />} />
 
 
                 <Route

@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const StockMovement = require('../models/StockMovement');
 
 module.exports = {
     async create(req, res) {
@@ -17,6 +18,15 @@ module.exports = {
             name,
             pricePerKg,
             quantity
+        });
+
+        // Registrar entrada no estoque
+        await StockMovement.create({
+            userId: req.userId,
+            productId: product._id,
+            productName: product.name,
+            type: 'Entrada',
+            quantity: quantity
         });
 
         return res.status(201).json(product);
@@ -39,14 +49,29 @@ module.exports = {
             return res.status(400).json({ message: 'Preço deve ser maior que zero e quantidade não pode ser negativa!' });
         }
 
-        const product = await Product.findOneAndUpdate(
-            { _id: id, userId: req.userId },
-            { name, pricePerKg, quantity },
-            { new: true }
-        );
+        const product = await Product.findOne({ _id: id, userId: req.userId });
 
         if (!product) {
             return res.status(404).json({ message: 'Produto não encontrado!' });
+        }
+
+        const quantityDifference = quantity - product.quantity;
+
+        // Atualizar produto
+        product.name = name;
+        product.pricePerKg = pricePerKg;
+        product.quantity = quantity;
+        await product.save();
+
+        // Registrar movimentação caso a quantidade tenha mudado
+        if (quantityDifference !== 0) {
+            await StockMovement.create({
+                userId: req.userId,
+                productId: product._id,
+                productName: product.name,
+                type: quantityDifference > 0 ? 'Entrada' : 'Saída',
+                quantity: Math.abs(quantityDifference)
+            });
         }
 
         return res.json(product);
