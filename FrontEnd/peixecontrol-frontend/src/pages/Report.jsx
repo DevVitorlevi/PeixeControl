@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import { ContentContainer } from '../styles/ContentContainer';
+import styled from 'styled-components';
 import {
     ReportsContainer,
     Title,
@@ -18,37 +21,64 @@ import {
     FullWidthCard,
 } from '../styles/ReportStyles';
 
+// Novo styled components para o header responsivo
+const HeaderControls = styled.div`
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+`;
+
+const ExportControls = styled.div`
+  display: flex;
+  gap: 10px;
+
+  select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 8px 12px;
+    border-radius: 5px;
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #1e8449;
+    }
+  }
+`;
+
 export default function Reports() {
-    const [salesSummary, setSalesSummary] = useState(null);
     const [lowStock, setLowStock] = useState([]);
     const [salesHistory, setSalesHistory] = useState([]);
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [monthlySummary, setMonthlySummary] = useState(null);
     const [selectedMonth, setSelectedMonth] = useState(new Date());
+    const [exportType, setExportType] = useState('daily');
 
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
 
     useEffect(() => {
-        const interval = setInterval(async () => {
-            try {
-                const res = await api.get('/reports/low-stock');
-                if (res.data.length > 0) {
-                    res.data.forEach(product => {
-                        toast.warn(`Estoque baixo: ${product.name} (${product.quantity} kg restantes)`);
-                    });
-                }
-            } catch {
-                console.error('Erro ao verificar estoque baixo');
-            }
-        }, 300000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    useEffect(() => {
-        fetchSalesSummary();
         fetchLowStock();
         fetchSalesHistory();
     }, [selectedDate]);
@@ -56,30 +86,6 @@ export default function Reports() {
     useEffect(() => {
         fetchMonthlySummary();
     }, [selectedMonth]);
-
-    useEffect(() => {
-        if (selectedSale) {
-            if (overlayRef.current && contentRef.current) {
-                void overlayRef.current.offsetWidth;
-                overlayRef.current.classList.add('open');
-                contentRef.current.classList.add('open');
-            }
-        } else {
-            if (overlayRef.current && contentRef.current) {
-                overlayRef.current.classList.remove('open');
-                contentRef.current.classList.remove('open');
-            }
-        }
-    }, [selectedSale]);
-
-    async function fetchSalesSummary() {
-        try {
-            const res = await api.get(`/reports/sales-summary?date=${selectedDate.toISOString().split('T')[0]}`);
-            setSalesSummary(res.data);
-        } catch {
-            toast.error('Erro ao carregar resumo de vendas');
-        }
-    }
 
     async function fetchLowStock() {
         try {
@@ -131,16 +137,72 @@ export default function Reports() {
         { totalValue: 0, totalKg: 0 }
     );
 
+    function exportPDF(data, fileName) {
+        if (data.length === 0) {
+            toast.warn('Nenhuma venda para exportar.');
+            return;
+        }
+
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(fileName, 14, 20);
+
+        const tableData = [];
+        data.forEach(sale => {
+            sale.items.forEach(item => {
+                tableData.push([
+                    new Date(sale.saleDate).toLocaleString(),
+                    item.productName,
+                    `${item.quantitySold} kg`,
+                    `R$ ${item.pricePerKg.toFixed(2)}`,
+                    `R$ ${(item.pricePerKg * item.quantitySold).toFixed(2)}`
+                ]);
+            });
+        });
+
+        autoTable(doc, {
+            head: [['Data', 'Produto', 'Quantidade', 'Preço por Kg', 'Total']],
+            body: tableData,
+            startY: 30,
+        });
+
+        const finalY = doc.lastAutoTable.finalY || 40;
+        const totalValue = data.reduce((sum, sale) => sum + sale.total, 0);
+        const totalKg = data.reduce((sum, sale) => sum + sale.items.reduce((acc, item) => acc + item.quantitySold, 0), 0);
+
+        doc.text(`Total Vendido: R$ ${totalValue.toFixed(2)}`, 14, finalY + 10);
+        doc.text(`Quantidade Vendida: ${totalKg.toFixed(2)} kg`, 14, finalY + 20);
+
+        doc.save(`${fileName}.pdf`);
+    }
+
+    function handleExport() {
+        if (exportType === 'daily') {
+            exportPDF(salesHistory, `Relatorio-Vendas-${selectedDate.toISOString().split('T')[0]}`);
+        } else if (exportType === 'monthly' && monthlySummary && monthlySummary.sales) {
+            exportPDF(monthlySummary.sales, `Relatorio-Mensal-${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}`);
+        }
+    }
+
     return (
         <ContentContainer>
             <ReportsContainer>
-                <Title>Relatórios de Vendas</Title>
+                <HeaderControls>
+                    <Title>Relatórios de Vendas</Title>
+                    <ExportControls>
+                        <select
+                            value={exportType}
+                            onChange={(e) => setExportType(e.target.value)}
+                            aria-label="Tipo de relatório"
+                        >
+                            <option value="daily">Relatório Diário</option>
+                            <option value="monthly">Relatório Mensal</option>
+                        </select>
+                        <button onClick={handleExport}>Exportar PDF</button>
+                    </ExportControls>
+                </HeaderControls>
 
                 <GridContainer>
-
-
-
-                    {/* Calendário Pequeno - Mês */}
                     <Card>
                         <Title>Selecionar Mês</Title>
                         <input
@@ -162,7 +224,6 @@ export default function Reports() {
                         )}
                     </Card>
 
-                    {/* Estoque Baixo */}
                     <Card>
                         <Title>Produtos com Estoque Baixo</Title>
                         <ReportsList>
@@ -178,7 +239,6 @@ export default function Reports() {
                         </ReportsList>
                     </Card>
 
-                    {/* Histórico do Dia */}
                     <FullWidthCard>
                         <input
                             type="date"
@@ -187,9 +247,7 @@ export default function Reports() {
                             max={new Date().toISOString().split('T')[0]}
                             style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                         />
-                        <Title>Vendas no Dia Selecionado
-
-                        </Title>
+                        <Title>Vendas no Dia Selecionado</Title>
                         <CartList>
                             {salesHistory.length > 0 ? (
                                 salesHistory.map((sale, index) => (
@@ -212,10 +270,8 @@ export default function Reports() {
                             </DailySummaryCard>
                         )}
                     </FullWidthCard>
-
                 </GridContainer>
 
-                {/* Modal Detalhado */}
                 {selectedSale && (
                     <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>
                         <ReportModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>

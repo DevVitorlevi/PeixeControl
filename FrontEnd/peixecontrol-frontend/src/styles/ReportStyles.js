@@ -8,12 +8,59 @@ export const ReportsContainer = styled.div`
   align-items: center;
 `;
 
+export const HeaderControls = styled.div`
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+`;
+
+export const ExportControls = styled.div`
+  display: flex;
+  gap: 10px;
+
+  select {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  button {
+    padding: 8px 12px;
+    border-radius: 5px;
+    background-color: #27ae60;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #1e8449;
+    }
+  }
+`;
+
 export const Title = styled.h2`
   font-size: 2.2rem;
   font-weight: 700;
   color: #084298;
-  margin-bottom: 20px;
   text-align: center;
+  margin-bottom: .8rem;
+  @media (max-width: 768px) {
+    text-align: left;
+  }
 `;
 
 export const ReportsList = styled.ul`
