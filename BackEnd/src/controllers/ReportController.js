@@ -34,40 +34,38 @@ module.exports = {
     const { date } = req.query;
 
     try {
-        const match = { userId: req.userId };
+      const match = { userId: req.userId };
 
-        if (date) {
-            const startDate = new Date(date);
-            startDate.setHours(0, 0, 0, 0);
-            const endDate = new Date(date);
-            endDate.setHours(23, 59, 59, 999);
+      if (date) {
+        const startDate = new Date(date);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(date);
+        endDate.setHours(23, 59, 59, 999);
 
-            match.saleDate = { $gte: startDate, $lte: endDate };
-        }
+        match.saleDate = { $gte: startDate, $lte: endDate };
+      }
 
-        const topProducts = await Sale.aggregate([
-            { $match: match },
-            { $unwind: '$items' },
-            {
-                $group: {
-                    _id: '$items.productId',
-                    productName: { $first: '$items.productName' },
-                    totalQuantity: { $sum: '$items.quantitySold' },
-                    totalSalesValue: { $sum: { $multiply: ['$items.pricePerKg', '$items.quantitySold'] } }
-                }
-            },
-            { $sort: { totalQuantity: -1 } },
-            { $limit: 5 }
-        ]);
+      const topProducts = await Sale.aggregate([
+        { $match: match },
+        { $unwind: '$items' },
+        {
+          $group: {
+            _id: '$items.productId',
+            productName: { $first: '$items.productName' },
+            totalQuantity: { $sum: '$items.quantitySold' },
+            totalSalesValue: { $sum: { $multiply: ['$items.pricePerKg', '$items.quantitySold'] } }
+          }
+        },
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 5 }
+      ]);
 
-        return res.json(topProducts);
+      return res.json(topProducts);
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erro ao buscar produtos mais vendidos' });
+      console.error(error);
+      return res.status(500).json({ message: 'Erro ao buscar produtos mais vendidos' });
     }
-}
-
-,
+  },
 
   async lowStock(req, res) {
     try {
@@ -134,5 +132,33 @@ module.exports = {
     } catch (error) {
       return res.status(500).json({ message: 'Erro ao buscar histórico de vendas' });
     }
-  }
+  },
+
+  async monthlySummary(req, res) {
+    const { month, year } = req.query;
+
+    if (!month || !year) {
+        return res.status(400).json({ message: 'Mês e ano são obrigatórios' });
+    }
+
+    try {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 0, 23, 59, 59, 999);
+
+        const sales = await Sale.find({
+            userId: req.userId,
+            saleDate: { $gte: startDate, $lte: endDate }
+        });
+
+        const totalSalesValue = sales.reduce((sum, sale) => sum + sale.total, 0);
+        const totalQuantity = sales.reduce((sum, sale) => {
+            return sum + sale.items.reduce((itemSum, item) => itemSum + item.quantitySold, 0);
+        }, 0);
+
+        return res.json({ totalSalesValue, totalQuantity });
+    } catch (error) {
+        return res.status(500).json({ message: 'Erro ao buscar resumo mensal' });
+    }
+}
+
 };

@@ -22,6 +22,9 @@ export default function Reports() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [selectedDate, setSelectedDate] = useState(new Date());
 
+    const [monthlySummary, setMonthlySummary] = useState(null);
+    const [selectedMonth, setSelectedMonth] = useState(new Date());
+
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
 
@@ -49,9 +52,13 @@ export default function Reports() {
     }, [selectedDate]);
 
     useEffect(() => {
+        fetchMonthlySummary();
+    }, [selectedMonth]);
+
+    useEffect(() => {
         if (selectedSale) {
             if (overlayRef.current && contentRef.current) {
-                void overlayRef.current.offsetWidth; // força reflow
+                void overlayRef.current.offsetWidth;
                 overlayRef.current.classList.add('open');
                 contentRef.current.classList.add('open');
             }
@@ -90,6 +97,17 @@ export default function Reports() {
         }
     }
 
+    async function fetchMonthlySummary() {
+        try {
+            const month = selectedMonth.getMonth() + 1;
+            const year = selectedMonth.getFullYear();
+            const res = await api.get(`/reports/monthly-summary?month=${month}&year=${year}`);
+            setMonthlySummary(res.data);
+        } catch {
+            toast.error('Erro ao carregar resumo mensal');
+        }
+    }
+
     function handleOpenModal(sale) {
         setSelectedSale(sale);
     }
@@ -98,7 +116,6 @@ export default function Reports() {
         if (overlayRef.current && contentRef.current) {
             contentRef.current.classList.remove('open');
             overlayRef.current.classList.remove('open');
-
             setTimeout(() => setSelectedSale(null), 300);
         }
     }
@@ -124,6 +141,23 @@ export default function Reports() {
                     dateFormat="dd/MM/yyyy"
                     inline
                 />
+
+                <Title>Selecionar Mês</Title>
+                <ReactDatePicker
+                    selected={selectedMonth}
+                    onChange={(date) => setSelectedMonth(date)}
+                    dateFormat="MM/yyyy"
+                    showMonthYearPicker
+                    inline
+                />
+
+                {monthlySummary && (
+                    <DailySummaryCard>
+                        <h3>Resumo do Mês</h3>
+                        <p>Total Vendido: R$ {monthlySummary.totalSalesValue.toFixed(2)}</p>
+                        <p>Quantidade Vendida: {monthlySummary.totalQuantity.toFixed(2)} kg</p>
+                    </DailySummaryCard>
+                )}
 
                 <Title>Produtos com Estoque Baixo</Title>
                 <ReportsList>
