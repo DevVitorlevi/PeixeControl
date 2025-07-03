@@ -265,3 +265,57 @@ export const FullWidthCard = styled(Card)`
     grid-column: span 1;
   }
 `;
+
+export const TopActionsContainer = styled.div`
+  width: 100%;
+  max-width: 1300px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .right {
+    display: flex;
+    gap: 10px;
+
+    select {
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 8px 12px;
+      border-radius: 5px;
+      background-color: #27ae60;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+
+      &:hover {
+        background-color: #1e8449;
+      }
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+`;

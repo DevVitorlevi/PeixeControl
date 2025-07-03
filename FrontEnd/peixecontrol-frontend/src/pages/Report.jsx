@@ -4,7 +4,6 @@ import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ContentContainer } from '../styles/ContentContainer';
-import styled from 'styled-components';
 import {
     ReportsContainer,
     Title,
@@ -19,52 +18,8 @@ import {
     GridContainer,
     Card,
     FullWidthCard,
+    TopActionsContainer
 } from '../styles/ReportStyles';
-
-// Novo styled components para o header responsivo
-const HeaderControls = styled.div`
-  width: 100%;
-  max-width: 1300px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-`;
-
-const ExportControls = styled.div`
-  display: flex;
-  gap: 10px;
-
-  select {
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    cursor: pointer;
-    font-size: 1rem;
-  }
-
-  button {
-    padding: 8px 12px;
-    border-radius: 5px;
-    background-color: #27ae60;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-
-    &:hover {
-      background-color: #1e8449;
-    }
-  }
-`;
 
 export default function Reports() {
     const [lowStock, setLowStock] = useState([]);
@@ -77,6 +32,10 @@ export default function Reports() {
 
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
+
+    function isValidDate(d) {
+        return d instanceof Date && !isNaN(d);
+    }
 
     useEffect(() => {
         fetchLowStock();
@@ -187,33 +146,30 @@ export default function Reports() {
     return (
         <ContentContainer>
             <ReportsContainer>
-                <HeaderControls>
-                    <Title>Relatórios de Vendas</Title>
-                    <ExportControls>
-                        <select
-                            value={exportType}
-                            onChange={(e) => setExportType(e.target.value)}
-                            aria-label="Tipo de relatório"
-                        >
+                <TopActionsContainer>
+                    <div className="left">
+                        <Title>Relatórios de Vendas</Title>
+                    </div>
+                    <div className="right">
+                        <select value={exportType} onChange={(e) => setExportType(e.target.value)}>
                             <option value="daily">Relatório Diário</option>
                             <option value="monthly">Relatório Mensal</option>
                         </select>
                         <button onClick={handleExport}>Exportar PDF</button>
-                    </ExportControls>
-                </HeaderControls>
+                    </div>
+                </TopActionsContainer>
 
                 <GridContainer>
                     <Card>
                         <Title>Selecionar Mês</Title>
                         <input
                             type="month"
-                            value={`${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}`}
+                            value={isValidDate(selectedMonth) ? `${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}` : ''}
                             onChange={(e) => {
                                 const [year, month] = e.target.value.split('-');
                                 setSelectedMonth(new Date(year, month - 1));
                             }}
                             max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
-                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                         />
                         {monthlySummary && (
                             <MonthSummaryCard>
@@ -242,10 +198,9 @@ export default function Reports() {
                     <FullWidthCard>
                         <input
                             type="date"
-                            value={selectedDate.toISOString().split('T')[0]}
+                            value={isValidDate(selectedDate) ? selectedDate.toISOString().split('T')[0] : ''}
                             onChange={(e) => setSelectedDate(new Date(e.target.value))}
                             max={new Date().toISOString().split('T')[0]}
-                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
                         />
                         <Title>Vendas no Dia Selecionado</Title>
                         <CartList>

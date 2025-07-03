@@ -155,10 +155,12 @@ module.exports = {
             return sum + sale.items.reduce((itemSum, item) => itemSum + item.quantitySold, 0);
         }, 0);
 
-        return res.json({ totalSalesValue, totalQuantity });
+        // 🔥 Adicione o array de vendas na resposta
+        return res.json({ totalSalesValue, totalQuantity, sales });
     } catch (error) {
         return res.status(500).json({ message: 'Erro ao buscar resumo mensal' });
     }
 }
+
 
 };
