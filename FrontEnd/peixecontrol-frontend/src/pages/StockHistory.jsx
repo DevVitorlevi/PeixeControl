@@ -74,7 +74,6 @@ export default function StockHistory() {
             <Title>Histórico de Movimentação do Estoque</Title>
 
             <DatePickerContainer>
-                <label htmlFor="datePicker">Selecione a data: </label>
                 <input
                     type="date"
                     id="datePicker"

@@ -11,7 +11,7 @@ export const ReportsContainer = styled.div`
 export const Title = styled.h2`
   font-size: 2.2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #084298;
   margin-bottom: 20px;
   text-align: center;
 `;
@@ -93,6 +93,7 @@ export const MonthSummaryCard = styled.div`
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   margin-top: 1rem;
   text-align: center;
+  width: 100%;
   h3 {
     font-size: 1.4rem;
     margin-bottom: .8rem;
@@ -199,18 +200,20 @@ export const Card = styled.div`
     font-size: 1.4rem;
     width: 100%;
     cursor: pointer;
+    color: #3700ff;
     transition: border-color 0.3s;
 
-    &:focus {
-      outline: none;
-      border-color: #2c3e50;
-    }
   }
 `;
 
 export const FullWidthCard = styled(Card)`
-  grid-column: span 3;
-
+  grid-column: span 2;
+  position: relative;
+  input{
+    margin-bottom: .9rem;
+    color:#3700ff;
+    width: 13rem;
+  }
   @media (max-width: 1120px) {
     grid-column: span 1;
   }

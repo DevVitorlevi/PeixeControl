@@ -138,17 +138,7 @@ export default function Reports() {
 
                 <GridContainer>
 
-                    {/* Calendário Pequeno - Data */}
-                    <Card>
-                        <Title>Selecionar Data</Title>
-                        <input
-                            type="date"
-                            value={selectedDate.toISOString().split('T')[0]}
-                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                            max={new Date().toISOString().split('T')[0]}
-                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
-                        />
-                    </Card>
+
 
                     {/* Calendário Pequeno - Mês */}
                     <Card>
@@ -190,7 +180,16 @@ export default function Reports() {
 
                     {/* Histórico do Dia */}
                     <FullWidthCard>
-                        <Title>Vendas no Dia Selecionado</Title>
+                        <input
+                            type="date"
+                            value={selectedDate.toISOString().split('T')[0]}
+                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                            max={new Date().toISOString().split('T')[0]}
+                            style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+                        />
+                        <Title>Vendas no Dia Selecionado
+
+                        </Title>
                         <CartList>
                             {salesHistory.length > 0 ? (
                                 salesHistory.map((sale, index) => (
