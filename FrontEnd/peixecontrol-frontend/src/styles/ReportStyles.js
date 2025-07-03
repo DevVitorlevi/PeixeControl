@@ -16,131 +16,93 @@ export const Title = styled.h2`
   text-align: center;
 `;
 
-export const ReportCard = styled.div`
-  background-color: white;
-  border-radius: 12px;
-  padding: 25px 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-  margin-bottom: 20px;
-  width: 100%;
-  margin-top: 2rem;
-  max-width: 500px;
-
-  @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 auto 20px auto;
-  }
-`;
-
 export const ReportsList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0 0 20px 0;
   width: 100%;
   max-width: 500px;
-
-  @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 auto 20px auto;
-  }
 `;
 
 export const ReportListItem = styled.li`
-  background-color:rgb(242, 48, 35);
+  background-color: rgb(242, 48, 35);
   border-radius: 8px;
   padding: 15px 20px;
   margin-bottom: 10px;
   font-size: 1.1rem;
-  color:rgb(255, 255, 255);
+  color: rgb(255, 255, 255);
   display: flex;
   justify-content: space-between;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    margin: 0 auto 10px auto;
-  }
 `;
 
-export const FilterContainer = styled.div`
+export const CartList = styled.ul`
+  list-style: none;
+  padding: 0;
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  justify-content: center;
-`;
-
-export const FilterButton = styled.button`
-  padding: 10px 20px;
-  background-color: ${({ $active }) => ($active ? '#2980b9' : '#bdc3c7')};
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 10px;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #1c5980;
-  }
-`;
-
-export const AlertCard = styled.div`
-  background-color: #e74c3c;
-  color: white;
-  font-weight: bold;
-  padding: 15px 20px;
-  border-radius: 8px;
-  text-align: center;
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 500px;
-
-  @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 auto 20px auto;
-  }
-`;
-
-export const DatePickerContainer = styled.div`
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
-
-  @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 auto 20px auto;
-  }
+  justify-content: center;
+  flex-direction: column;
 `;
 
-export const DateInput = styled.input`
-  padding: 12px;
-  border: 1px solid #bdc3c7;
+export const CartItem = styled.li`
+  background-color: #084298;
+  padding: 20px 25px;
   border-radius: 10px;
-  font-size: 1rem;
-  margin-bottom: 10px;
-  transition: border-color 0.3s;
-
-  &:focus {
-    border-color: #3498db;
-    outline: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-bottom: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 8px;
+  font-size: 1.4rem;
+  color: rgb(255, 255, 255);
+  transition: background-color 0.3s;
+  &:hover {
+    background-color: rgb(24, 118, 212);
   }
 `;
 
-export const SearchButton = styled.button`
-  padding: 10px 20px;
-  background-color: #27ae60;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+export const DailySummaryCard = styled.div`
+  background-color: #e8f5e9;
+  border: 2px solid #2ecc71;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+  text-align: center;
+  h3 {
+    font-size: 1.8rem;
+    margin-bottom: .8rem;
+    color: #27ae60;
+  }
 
-  &:hover {
-    background-color: #1e8449;
+  p {
+    font-size: 1.6rem;
+    color: #27ae60;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+`;
+export const MonthSummaryCard = styled.div`
+  background-color: #e8f5e9;
+  border: 2px solid #2ecc71;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  margin-top: 1rem;
+  text-align: center;
+  h3 {
+    font-size: 1.4rem;
+    margin-bottom: .8rem;
+    color: #27ae60;
+  }
+
+  p {
+    font-size: 1.2rem;
+    color: #27ae60;
+    font-weight: bold;
+    margin-bottom: 10px;
   }
 `;
 
@@ -209,38 +171,37 @@ export const ReportModalContent = styled.div`
   }
 `;
 
-export const DailySummaryCard = styled.div`
-  background-color: #e8f5e9; /* Verde bem claro */
-  border: 2px solid #2ecc71; /* Verde vivo para borda */
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  margin-bottom: 20px;
-  width: 40vw;
-
-  text-align: center;
+export const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 2rem;
 
   @media (max-width: 768px) {
-    width: 90%;
-    margin: 0 auto 20px auto;
-  }
-
-  h3 {
-    font-size: 1.8rem;
-    color: #27ae60;
-    margin-bottom: 15px;
-  }
-
-  p {
-    font-size: 1.6rem;
-    color: #27ae60;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-
-  span {
-    color: #145a32;
-    font-weight: bold;
-    font-size: 1.4rem;
+    grid-template-columns: 1fr;
   }
 `;
+
+export const Card = styled.div`
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
+
+export const FullWidthCard = styled(Card)`
+  grid-column: span 3;
+
+  @media (max-width: 1120px) {
+    grid-column: span 1;
+    
+  }
+`;
+
+
