@@ -20,8 +20,6 @@ import {
     ButtonGroup,
     Button,
 } from '../styles/ModalStyles';
-
-import { ContentContainer } from '../styles/ContentContainer';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 
@@ -170,100 +168,99 @@ export default function Estoque() {
     );
 
     return (
-        <ContentContainer>
-            <EstoqueContainer>
-                <Title>Estoque</Title>
-                <ButtonAdd onClick={openAddModal}>+ Adicionar Produto</ButtonAdd>
+        <EstoqueContainer>
+            <Title>Estoque</Title>
 
-                <SearchInput
-                    type="text"
-                    placeholder="Pesquisar peixe..."
-                    value={searchTerm}
-                    onChange={e => setSearchTerm(e.target.value)}
-                />
+            <ButtonAdd onClick={openAddModal}>+ Adicionar Produto</ButtonAdd>
+            <SearchInput
+                type="text"
+                placeholder="Pesquisar peixe..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+            />
 
-                {loading ? (
-                    <p>Carregando produtos...</p>
-                ) : (
-                    <Table>
-                        <Thead>
-                            <tr>
-                                <Th>Nome do Peixe</Th>
-                                <Th>Quantidade (kg)</Th>
-                                <Th>Preço por kg (R$)</Th>
-                                <Th>Ações</Th>
-                            </tr>
-                        </Thead>
-                        <tbody>
-                            {produtosFiltrados.length > 0 ? (
-                                produtosFiltrados.map(produto => (
-                                    <tr key={produto._id}>
-                                        <Td>{produto.name}</Td>
-                                        <Td>{produto.quantity}</Td>
-                                        <Td>{produto.pricePerKg.toFixed(2)}</Td>
-                                        <Td>
-                                            <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
-                                            <ActionButton
-                                                className="delete"
-                                                onClick={() => handleDelete(produto._id)}
-                                            >
-                                                Excluir
-                                            </ActionButton>
-                                        </Td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <Td colSpan={4} style={{ textAlign: 'center' }}>
-                                        Nenhum peixe encontrado.
+
+            {loading ? (
+                <p>Carregando produtos...</p>
+            ) : (
+                <Table>
+                    <Thead>
+                        <tr>
+                            <Th>Nome do Peixe</Th>
+                            <Th>Quantidade (kg)</Th>
+                            <Th>Preço por kg (R$)</Th>
+                            <Th>Ações</Th>
+                        </tr>
+                    </Thead>
+                    <tbody>
+                        {produtosFiltrados.length > 0 ? (
+                            produtosFiltrados.map(produto => (
+                                <tr key={produto._id}>
+                                    <Td>{produto.name}</Td>
+                                    <Td>{produto.quantity}</Td>
+                                    <Td>{produto.pricePerKg.toFixed(2)}</Td>
+                                    <Td>
+                                        <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
+                                        <ActionButton
+                                            className="delete"
+                                            onClick={() => handleDelete(produto._id)}
+                                        >
+                                            Excluir
+                                        </ActionButton>
                                     </Td>
                                 </tr>
-                            )}
-                        </tbody>
-                    </Table>
-                )}
+                            ))
+                        ) : (
+                            <tr>
+                                <Td colSpan={4} style={{ textAlign: 'center' }}>
+                                    Nenhum peixe encontrado.
+                                </Td>
+                            </tr>
+                        )}
+                    </tbody>
+                </Table>
+            )}
 
-                {modalOpen && (
-                    <Overlay onClick={closeModal}>
-                        <ModalContainer onClick={e => e.stopPropagation()}>
-                            <ModalTitle>{editingId ? 'Editar Produto' : 'Adicionar Produto'}</ModalTitle>
-                            <Form onSubmit={handleSubmit}>
-                                <Input
-                                    type="text"
-                                    name="nome"
-                                    placeholder="Nome do Peixe"
-                                    value={form.nome}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <Input
-                                    type="number"
-                                    name="quantidade"
-                                    placeholder="Quantidade (kg)"
-                                    value={form.quantidade}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <Input
-                                    type="number"
-                                    step="0.01"
-                                    name="preco"
-                                    placeholder="Preço por kg (R$)"
-                                    value={form.preco}
-                                    onChange={handleChange}
-                                    required
-                                />
-                                <ButtonGroup>
-                                    <Button $isCancel type="button" onClick={closeModal}>
-                                        Cancelar
-                                    </Button>
-                                    <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>
-                                </ButtonGroup>
-                            </Form>
-                        </ModalContainer>
-                    </Overlay>
-                )}
-            </EstoqueContainer>
-        </ContentContainer>
+            {modalOpen && (
+                <Overlay onClick={closeModal}>
+                    <ModalContainer onClick={e => e.stopPropagation()}>
+                        <ModalTitle>{editingId ? 'Editar Produto' : 'Adicionar Produto'}</ModalTitle>
+                        <Form onSubmit={handleSubmit}>
+                            <Input
+                                type="text"
+                                name="nome"
+                                placeholder="Nome do Peixe"
+                                value={form.nome}
+                                onChange={handleChange}
+                                required
+                            />
+                            <Input
+                                type="number"
+                                name="quantidade"
+                                placeholder="Quantidade (kg)"
+                                value={form.quantidade}
+                                onChange={handleChange}
+                                required
+                            />
+                            <Input
+                                type="number"
+                                step="0.01"
+                                name="preco"
+                                placeholder="Preço por kg (R$)"
+                                value={form.preco}
+                                onChange={handleChange}
+                                required
+                            />
+                            <ButtonGroup>
+                                <Button $isCancel type="button" onClick={closeModal}>
+                                    Cancelar
+                                </Button>
+                                <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>
+                            </ButtonGroup>
+                        </Form>
+                    </ModalContainer>
+                </Overlay>
+            )}
+        </EstoqueContainer>
     );
 }

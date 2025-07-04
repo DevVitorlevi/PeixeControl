@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
 export const SalesContainer = styled.div`
-  width: 100%;
+  width: 60%;
   padding: 20px;
-
+  margin: 0 auto;
   @media (max-width: 768px) {
     padding: 10px;
   }
@@ -95,7 +95,7 @@ export const CartItem = styled.li`
   font-size: 1.4rem;
   color:rgb(255, 255, 255);
   transition: background-color 0.3s;
-  width: 40vw;
+  width: 100%;
   &:hover {
     background-color:rgb(24, 118, 212);
   }

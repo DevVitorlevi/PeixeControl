@@ -3,7 +3,6 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ContentContainer } from '../styles/ContentContainer';
 import {
     ReportsContainer,
     Title,
@@ -144,107 +143,105 @@ export default function Reports() {
     }
 
     return (
-        <ContentContainer>
-            <ReportsContainer>
-                <TopActionsContainer>
-                    <div className="left">
-                        <Title>Relatórios de Vendas</Title>
-                    </div>
-                    <div className="right">
-                        <select value={exportType} onChange={(e) => setExportType(e.target.value)}>
-                            <option value="daily">Relatório Diário</option>
-                            <option value="monthly">Relatório Mensal</option>
-                        </select>
-                        <button onClick={handleExport}>Exportar PDF</button>
-                    </div>
-                </TopActionsContainer>
+        <ReportsContainer>
+            <TopActionsContainer>
+                <div className="left">
+                    <Title>Relatórios de Vendas</Title>
+                </div>
+                <div className="right">
+                    <select value={exportType} onChange={(e) => setExportType(e.target.value)}>
+                        <option value="daily">Relatório Diário</option>
+                        <option value="monthly">Relatório Mensal</option>
+                    </select>
+                    <button onClick={handleExport}>Exportar PDF</button>
+                </div>
+            </TopActionsContainer>
 
-                <GridContainer>
-                    <Card>
-                        <Title>Selecionar Mês</Title>
-                        <input
-                            type="month"
-                            value={isValidDate(selectedMonth) ? `${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}` : ''}
-                            onChange={(e) => {
-                                const [year, month] = e.target.value.split('-');
-                                setSelectedMonth(new Date(year, month - 1));
-                            }}
-                            max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
-                        />
-                        {monthlySummary && (
-                            <MonthSummaryCard>
-                                <h3>Resumo do Mês</h3>
-                                <p>Total Vendido: R$ {monthlySummary.totalSalesValue.toFixed(2)}</p>
-                                <p>Quantidade Vendida: {monthlySummary.totalQuantity.toFixed(2)} kg</p>
-                            </MonthSummaryCard>
+            <GridContainer>
+                <Card>
+                    <Title>Selecionar Mês</Title>
+                    <input
+                        type="month"
+                        value={isValidDate(selectedMonth) ? `${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}` : ''}
+                        onChange={(e) => {
+                            const [year, month] = e.target.value.split('-');
+                            setSelectedMonth(new Date(year, month - 1));
+                        }}
+                        max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
+                    />
+                    {monthlySummary && (
+                        <MonthSummaryCard>
+                            <h3>Resumo do Mês</h3>
+                            <p>Total Vendido: R$ {monthlySummary.totalSalesValue.toFixed(2)}</p>
+                            <p>Quantidade Vendida: {monthlySummary.totalQuantity.toFixed(2)} kg</p>
+                        </MonthSummaryCard>
+                    )}
+                </Card>
+
+                <Card>
+                    <Title>Produtos com Estoque Baixo</Title>
+                    <ReportsList>
+                        {lowStock.length > 0 ? (
+                            lowStock.map(prod => (
+                                <ReportListItem key={prod._id}>
+                                    {prod.name} — {prod.quantity} kg
+                                </ReportListItem>
+                            ))
+                        ) : (
+                            <p>Nenhum produto com estoque baixo</p>
                         )}
-                    </Card>
+                    </ReportsList>
+                </Card>
 
-                    <Card>
-                        <Title>Produtos com Estoque Baixo</Title>
-                        <ReportsList>
-                            {lowStock.length > 0 ? (
-                                lowStock.map(prod => (
-                                    <ReportListItem key={prod._id}>
-                                        {prod.name} — {prod.quantity} kg
-                                    </ReportListItem>
-                                ))
-                            ) : (
-                                <p>Nenhum produto com estoque baixo</p>
-                            )}
-                        </ReportsList>
-                    </Card>
-
-                    <FullWidthCard>
-                        <input
-                            type="date"
-                            value={isValidDate(selectedDate) ? selectedDate.toISOString().split('T')[0] : ''}
-                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                            max={new Date().toISOString().split('T')[0]}
-                        />
-                        <Title>Vendas no Dia Selecionado</Title>
-                        <CartList>
-                            {salesHistory.length > 0 ? (
-                                salesHistory.map((sale, index) => (
-                                    <CartItem key={index} onClick={() => handleOpenModal(sale)}>
-                                        <span>Venda de {sale.items.length} item(s)</span>
-                                        <span>R$ {sale.total.toFixed(2)}</span>
-                                        <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
-                                    </CartItem>
-                                ))
-                            ) : (
-                                <p>Nenhuma venda registrada neste dia</p>
-                            )}
-                        </CartList>
-
-                        {salesHistory.length > 0 && (
-                            <DailySummaryCard>
-                                <h3>Resumo do Dia</h3>
-                                <p>Total Vendido: R$ {dailyTotals.totalValue.toFixed(2)}</p>
-                                <p>Quantidade Vendida: {dailyTotals.totalKg.toFixed(2)} kg</p>
-                            </DailySummaryCard>
+                <FullWidthCard>
+                    <input
+                        type="date"
+                        value={isValidDate(selectedDate) ? selectedDate.toISOString().split('T')[0] : ''}
+                        onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                        max={new Date().toISOString().split('T')[0]}
+                    />
+                    <Title>Vendas no Dia Selecionado</Title>
+                    <CartList>
+                        {salesHistory.length > 0 ? (
+                            salesHistory.map((sale, index) => (
+                                <CartItem key={index} onClick={() => handleOpenModal(sale)}>
+                                    <span>Venda de {sale.items.length} item(s)</span>
+                                    <span>R$ {sale.total.toFixed(2)}</span>
+                                    <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
+                                </CartItem>
+                            ))
+                        ) : (
+                            <p>Nenhuma venda registrada neste dia</p>
                         )}
-                    </FullWidthCard>
-                </GridContainer>
+                    </CartList>
 
-                {selectedSale && (
-                    <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>
-                        <ReportModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>
-                            <h2>Detalhes da Venda</h2>
-                            <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
-                            <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
-                            <ul>
-                                {selectedSale.items.map((item, idx) => (
-                                    <li key={idx}>
-                                        {item.productName} — {item.quantitySold} kg — R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
-                                    </li>
-                                ))}
-                            </ul>
-                            <p><strong>Total: R$ {selectedSale.total.toFixed(2)}</strong></p>
-                        </ReportModalContent>
-                    </ReportModalOverlay>
-                )}
-            </ReportsContainer>
-        </ContentContainer>
+                    {salesHistory.length > 0 && (
+                        <DailySummaryCard>
+                            <h3>Resumo do Dia</h3>
+                            <p>Total Vendido: R$ {dailyTotals.totalValue.toFixed(2)}</p>
+                            <p>Quantidade Vendida: {dailyTotals.totalKg.toFixed(2)} kg</p>
+                        </DailySummaryCard>
+                    )}
+                </FullWidthCard>
+            </GridContainer>
+
+            {selectedSale && (
+                <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>
+                    <ReportModalContent ref={contentRef} onClick={(e) => e.stopPropagation()}>
+                        <h2>Detalhes da Venda</h2>
+                        <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
+                        <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
+                        <ul>
+                            {selectedSale.items.map((item, idx) => (
+                                <li key={idx}>
+                                    {item.productName} — {item.quantitySold} kg — R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                                </li>
+                            ))}
+                        </ul>
+                        <p><strong>Total: R$ {selectedSale.total.toFixed(2)}</strong></p>
+                    </ReportModalContent>
+                </ReportModalOverlay>
+            )}
+        </ReportsContainer>
     );
 }

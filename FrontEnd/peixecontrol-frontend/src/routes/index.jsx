@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from '../pages/Auth/Login';
 import Header from '../components/Header';
-import Sidebar from '../components/SideBar';
+// import Sidebar removido
 import Estoque from '../pages/Estoque';
 import Sales from '../pages/Sales';
 import Reports from '../pages/Report';
@@ -12,9 +12,11 @@ import StockHistory from '../pages/StockHistory';
 function PrivateLayout({ children }) {
     return (
         <>
-            <Sidebar />
+
             <Header />
-            <main style={{ marginLeft: 250, marginTop: 60, padding: 20 }}>{children}</main>
+            <main style={{ marginTop: 60, padding: 20 }}>
+                {children}
+            </main>
         </>
     );
 }
@@ -41,7 +43,6 @@ export default function AppRoutes() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Login />} />
-
 
                 <Route
                     path="/estoque"
@@ -75,6 +76,7 @@ export default function AppRoutes() {
                         </PrivateRoute>
                     }
                 />
+
                 <Route
                     path="/movimentacoes"
                     element={

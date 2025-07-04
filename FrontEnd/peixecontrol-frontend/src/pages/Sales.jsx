@@ -16,7 +16,6 @@ import {
     ModalContent,
     CloseButton
 } from '../styles/SalesStyles';
-import { ContentContainer } from '../styles/ContentContainer';
 
 export default function Sales() {
     const [products, setProducts] = useState([]);
@@ -26,13 +25,10 @@ export default function Sales() {
     const [cart, setCart] = useState([]);
     const [sales, setSales] = useState([]);
     const [totalVendas, setTotalVendas] = useState(0);
-
     const [selectedSale, setSelectedSale] = useState(null);
 
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
-
-    // Criar objeto Audio para som da venda
     const saleSound = useRef(new Audio('/sounds/DIN.mp3')).current;
 
     useEffect(() => {
@@ -87,8 +83,8 @@ export default function Sales() {
     }
 
     function handleAddToCart() {
-        if (!productId || !quantity) {
-            toast.error('Preencha todos os campos');
+        if (!productId || !quantity || parseFloat(quantity) <= 0) {
+            toast.error('Preencha todos os campos corretamente');
             return;
         }
 
@@ -116,9 +112,7 @@ export default function Sales() {
         setCart(newCart);
     }
 
-    async function handleRegisterSale(e) {
-        e.preventDefault();
-
+    async function handleRegisterSale() {
         if (cart.length === 0) {
             toast.error('Adicione produtos ao carrinho');
             return;
@@ -134,6 +128,8 @@ export default function Sales() {
             });
 
             toast.success('Venda registrada com sucesso!');
+            saleSound.play().catch(() => { });
+
             fetchSales();
             setCart([]);
             setPaymentMethod('Pix');
@@ -142,15 +138,11 @@ export default function Sales() {
         }
     }
 
-    // Função que toca o som E chama o submit
     function handleClickFinalizar(e) {
-        // Tocar som na interação direta do clique
-        saleSound.play().catch(() => {
-            // Se não der pra tocar, ignora o erro
-        });
+        e.preventDefault();
 
-        // Depois chama o submit do form
-        handleRegisterSale(e);
+        // Tocar som e registrar venda
+        handleRegisterSale();
     }
 
     function handleSaleClick(sale) {
@@ -166,63 +158,60 @@ export default function Sales() {
     }
 
     return (
-        <ContentContainer>
-            <SalesContainer>
-                <Title>Caixa - Registro de Vendas</Title>
+        <SalesContainer>
+            <Title>Caixa - Registro de Vendas</Title>
 
-                <Form onSubmit={handleRegisterSale}>
-                    <Select value={productId} onChange={e => setProductId(e.target.value)}>
-                        <option value="">Selecione um peixe</option>
-                        {products.map(product => (
-                            <option key={product._id} value={product._id}>
-                                {product.name} - R$ {product.pricePerKg}/kg
-                            </option>
-                        ))}
-                    </Select>
+            <Form>
+                <Select value={productId} onChange={e => setProductId(e.target.value)}>
+                    <option value="">Selecione um peixe</option>
+                    {products.map(product => (
+                        <option key={product._id} value={product._id}>
+                            {product.name} - R$ {product.pricePerKg}/kg
+                        </option>
+                    ))}
+                </Select>
 
-                    <Input
-                        type="number"
-                        placeholder="Quantidade (kg)"
-                        value={quantity}
-                        onChange={e => setQuantity(e.target.value)}
-                        min="0"
-                        step="0.01"
-                    />
+                <Input
+                    type="number"
+                    placeholder="Quantidade (kg)"
+                    value={quantity}
+                    onChange={e => setQuantity(e.target.value)}
+                    min="0"
+                    step="0.01"
+                />
 
-                    <Button type="button" onClick={handleAddToCart}>Adicionar ao Carrinho</Button>
+                <Button type="button" onClick={handleAddToCart}>Adicionar ao Carrinho</Button>
 
-                    <CartList>
-                        {cart.map((item, index) => (
-                            <CartItem key={index}>
-                                {item.productName} - {item.quantitySold} kg - R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
-                                <RemoveButton onClick={() => handleRemoveFromCart(index)}>Remover</RemoveButton>
-                            </CartItem>
-                        ))}
-                    </CartList>
-
-                    <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                        <option value="Pix">Pix</option>
-                        <option value="Cartão de Crédito">Cartão de Crédito</option>
-                        <option value="Cartão de Débito">Cartão de Débito</option>
-                        <option value="Dinheiro">Dinheiro</option>
-                    </Select>
-
-                    {/* Aqui o botão finaliza venda com som */}
-                    <Button type="submit" onClick={handleClickFinalizar}>Finalizar Venda</Button>
-                </Form>
-
-                <Title>Vendas do Dia</Title>
                 <CartList>
-                    {sales.map((sale, index) => (
-                        <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
-                            <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
-                            <span>R$ {sale.total.toFixed(2)}</span>
+                    {cart.map((item, index) => (
+                        <CartItem key={index}>
+                            {item.productName} - {item.quantitySold} kg - R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                            <RemoveButton onClick={() => handleRemoveFromCart(index)}>Remover</RemoveButton>
                         </CartItem>
                     ))}
                 </CartList>
 
-                <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
-            </SalesContainer>
+                <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                    <option value="Pix">Pix</option>
+                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                    <option value="Cartão de Débito">Cartão de Débito</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </Select>
+
+                <Button type="button" onClick={handleClickFinalizar}>Finalizar Venda</Button>
+            </Form>
+
+            <Title>Vendas do Dia</Title>
+            <CartList>
+                {sales.map((sale, index) => (
+                    <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
+                        <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
+                        <span>R$ {sale.total.toFixed(2)}</span>
+                    </CartItem>
+                ))}
+            </CartList>
+
+            <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
 
             {selectedSale && (
                 <ModalOverlay ref={overlayRef} onClick={closeModal}>
@@ -242,6 +231,6 @@ export default function Sales() {
                     </ModalContent>
                 </ModalOverlay>
             )}
-        </ContentContainer>
+        </SalesContainer>
     );
 }

@@ -1,13 +1,19 @@
 import styled from 'styled-components';
 
 export const EstoqueContainer = styled.div`
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
+  margin: 0 auto; /* centraliza */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 
-  @media (min-width: 768px) {
-    width: 70vw;
+  @media (max-width: 600px) {
+    width: 100%; /* deixa o conteúdo mais compacto no desktop */
+  }
+  @media screen and (min-width:768px){
+    width: 80%;
+  } 
+  @media screen and (min-width:820px){
+    width: 80%;
   }
 `;
 
@@ -33,8 +39,6 @@ export const ButtonAdd = styled.button`
   font-weight: 700;
   cursor: pointer;
   margin-bottom: 20px;
-  width: 100%;
-  max-width: 320px;
   align-self: center;
   transition: background-color 0.3s ease;
   font-size: 1.4rem;
@@ -58,6 +62,7 @@ export const Table = styled.table`
 
   @media (max-width: 768px) {
     display: block;
+    width: 100%;
     overflow-x: auto;
     white-space: nowrap;
   }
@@ -66,13 +71,14 @@ export const Table = styled.table`
 export const Thead = styled.thead`
   background-color: #084298;
   color: white;
-`;
+  `;
 
 export const Th = styled.th`
   padding: 12px 10px;
   border: 1px solid #ddd;
   text-align: left;
   font-weight: 700;
+
 
   @media (min-width: 768px) {
     padding: 14px 12px;
