@@ -8,15 +8,12 @@ module.exports = async function (req, res, next) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        if (user.planType === 'assinatura') {
-            const today = new Date();
-            if (!user.subscriptionValidUntil || user.subscriptionValidUntil < today) {
-                return res.status(403).json({ message: 'Assinatura expirada. Acesse o administrador para renovar.' });
-            }
+        if (user.planType === 'assinatura' && user.subscriptionValidUntil && new Date() > user.subscriptionValidUntil) {
+            return res.status(403).json({ message: 'Assinatura expirada!' });
         }
 
-        next();
+        return next();
     } catch (err) {
-        return res.status(500).json({ message: 'Erro ao verificar assinatura' });
+        return res.status(500).json({ message: 'Erro na verificação da assinatura' });
     }
 };

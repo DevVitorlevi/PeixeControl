@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 module.exports = {
     async register(req, res) {
         try {
-            const { name, email, password, planType } = req.body;
+            const { name, email, password, planType, role } = req.body;
 
             if (!name || !email || !password) {
                 return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
@@ -33,6 +33,7 @@ module.exports = {
                 name,
                 email,
                 password: hashedPassword,
+                role: role || 'user',
                 planType: planType || 'assinatura',
                 subscriptionValidUntil
             });
@@ -61,13 +62,18 @@ module.exports = {
                 return res.status(400).json({ message: 'Email ou senha inválidos!' });
             }
 
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            const token = jwt.sign(
+                { id: user._id, role: user.role, planType: user.planType },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            );
 
             return res.json({
                 user: {
                     id: user._id,
                     name: user.name,
                     email: user.email,
+                    role: user.role,
                     planType: user.planType,
                     subscriptionValidUntil: user.subscriptionValidUntil
                 },

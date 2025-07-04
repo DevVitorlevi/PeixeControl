@@ -12,7 +12,9 @@ module.exports = function (req, res, next) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
-        next();
+        req.userRole = decoded.role;
+        req.planType = decoded.planType;
+        return next();
     } catch (err) {
         return res.status(401).json({ message: 'Token inválido!' });
     }
