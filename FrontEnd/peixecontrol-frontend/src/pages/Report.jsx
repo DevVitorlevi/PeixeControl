@@ -3,6 +3,7 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import Loader from '../components/Loader';
 import {
     ReportsContainer,
     Title,
@@ -28,6 +29,7 @@ export default function Reports() {
     const [monthlySummary, setMonthlySummary] = useState(null);
     const [selectedMonth, setSelectedMonth] = useState(new Date());
     const [exportType, setExportType] = useState('daily');
+    const [loading, setLoading] = useState(false);
 
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
@@ -56,21 +58,27 @@ export default function Reports() {
 
     async function fetchSalesHistory() {
         try {
+            setLoading(true);
             const res = await api.get(`/reports/sales-history?date=${selectedDate.toISOString().split('T')[0]}`);
             setSalesHistory(res.data);
         } catch {
             toast.error('Erro ao carregar histórico de vendas');
+        } finally {
+            setLoading(false);
         }
     }
 
     async function fetchMonthlySummary() {
         try {
+            setLoading(true);
             const month = selectedMonth.getMonth() + 1;
             const year = selectedMonth.getFullYear();
             const res = await api.get(`/reports/monthly-summary?month=${month}&year=${year}`);
             setMonthlySummary(res.data);
         } catch {
             toast.error('Erro ao carregar resumo mensal');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -157,73 +165,75 @@ export default function Reports() {
                 </div>
             </TopActionsContainer>
 
-            <GridContainer>
-                <Card>
-                    <Title>Selecionar Mês</Title>
-                    <input
-                        type="month"
-                        value={isValidDate(selectedMonth) ? `${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}` : ''}
-                        onChange={(e) => {
-                            const [year, month] = e.target.value.split('-');
-                            setSelectedMonth(new Date(year, month - 1));
-                        }}
-                        max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
-                    />
-                    {monthlySummary && (
-                        <MonthSummaryCard>
-                            <h3>Resumo do Mês</h3>
-                            <p>Total Vendido: R$ {monthlySummary.totalSalesValue.toFixed(2)}</p>
-                            <p>Quantidade Vendida: {monthlySummary.totalQuantity.toFixed(2)} kg</p>
-                        </MonthSummaryCard>
-                    )}
-                </Card>
-
-                <Card>
-                    <Title>Produtos com Estoque Baixo</Title>
-                    <ReportsList>
-                        {lowStock.length > 0 ? (
-                            lowStock.map(prod => (
-                                <ReportListItem key={prod._id}>
-                                    {prod.name} — {prod.quantity} kg
-                                </ReportListItem>
-                            ))
-                        ) : (
-                            <p>Nenhum produto com estoque baixo</p>
+            {loading ? <Loader /> : (
+                <GridContainer>
+                    <Card>
+                        <Title>Selecionar Mês</Title>
+                        <input
+                            type="month"
+                            value={isValidDate(selectedMonth) ? `${selectedMonth.getFullYear()}-${(selectedMonth.getMonth() + 1).toString().padStart(2, '0')}` : ''}
+                            onChange={(e) => {
+                                const [year, month] = e.target.value.split('-');
+                                setSelectedMonth(new Date(year, month - 1));
+                            }}
+                            max={`${new Date().getFullYear()}-${(new Date().getMonth() + 1).toString().padStart(2, '0')}`}
+                        />
+                        {monthlySummary && (
+                            <MonthSummaryCard>
+                                <h3>Resumo do Mês</h3>
+                                <p>Total Vendido: R$ {monthlySummary.totalSalesValue.toFixed(2)}</p>
+                                <p>Quantidade Vendida: {monthlySummary.totalQuantity.toFixed(2)} kg</p>
+                            </MonthSummaryCard>
                         )}
-                    </ReportsList>
-                </Card>
+                    </Card>
 
-                <FullWidthCard>
-                    <input
-                        type="date"
-                        value={isValidDate(selectedDate) ? selectedDate.toISOString().split('T')[0] : ''}
-                        onChange={(e) => setSelectedDate(new Date(e.target.value))}
-                        max={new Date().toISOString().split('T')[0]}
-                    />
-                    <Title>Vendas no Dia Selecionado</Title>
-                    <CartList>
-                        {salesHistory.length > 0 ? (
-                            salesHistory.map((sale, index) => (
-                                <CartItem key={index} onClick={() => handleOpenModal(sale)}>
-                                    <span>Venda de {sale.items.length} item(s)</span>
-                                    <span>R$ {sale.total.toFixed(2)}</span>
-                                    <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
-                                </CartItem>
-                            ))
-                        ) : (
-                            <p>Nenhuma venda registrada neste dia</p>
+                    <Card>
+                        <Title>Produtos com Estoque Baixo</Title>
+                        <ReportsList>
+                            {lowStock.length > 0 ? (
+                                lowStock.map(prod => (
+                                    <ReportListItem key={prod._id}>
+                                        {prod.name} — {prod.quantity} kg
+                                    </ReportListItem>
+                                ))
+                            ) : (
+                                <p>Nenhum produto com estoque baixo</p>
+                            )}
+                        </ReportsList>
+                    </Card>
+
+                    <FullWidthCard>
+                        <input
+                            type="date"
+                            value={isValidDate(selectedDate) ? selectedDate.toISOString().split('T')[0] : ''}
+                            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                            max={new Date().toISOString().split('T')[0]}
+                        />
+                        <Title>Vendas no Dia Selecionado</Title>
+                        <CartList>
+                            {salesHistory.length > 0 ? (
+                                salesHistory.map((sale, index) => (
+                                    <CartItem key={index} onClick={() => handleOpenModal(sale)}>
+                                        <span>Venda de {sale.items.length} item(s)</span>
+                                        <span>R$ {sale.total.toFixed(2)}</span>
+                                        <span>{new Date(sale.saleDate).toLocaleDateString()}</span>
+                                    </CartItem>
+                                ))
+                            ) : (
+                                <p>Nenhuma venda registrada neste dia</p>
+                            )}
+                        </CartList>
+
+                        {salesHistory.length > 0 && (
+                            <DailySummaryCard>
+                                <h3>Resumo do Dia</h3>
+                                <p>Total Vendido: R$ {dailyTotals.totalValue.toFixed(2)}</p>
+                                <p>Quantidade Vendida: {dailyTotals.totalKg.toFixed(2)} kg</p>
+                            </DailySummaryCard>
                         )}
-                    </CartList>
-
-                    {salesHistory.length > 0 && (
-                        <DailySummaryCard>
-                            <h3>Resumo do Dia</h3>
-                            <p>Total Vendido: R$ {dailyTotals.totalValue.toFixed(2)}</p>
-                            <p>Quantidade Vendida: {dailyTotals.totalKg.toFixed(2)} kg</p>
-                        </DailySummaryCard>
-                    )}
-                </FullWidthCard>
-            </GridContainer>
+                    </FullWidthCard>
+                </GridContainer>
+            )}
 
             {selectedSale && (
                 <ReportModalOverlay ref={overlayRef} onClick={handleCloseModal}>

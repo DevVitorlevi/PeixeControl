@@ -13,8 +13,8 @@ import { AtSign, Eye, EyeClosed, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ImageSlider } from '../../components/ImageSlide';
-import { FlashMessage } from '../../components/FlashMessage';
 import { AuthContext } from '../../contexts/AuthContext';
+import { toast } from 'react-toastify';
 
 export const Login = () => {
     const [formData, setFormData] = useState({
@@ -23,7 +23,6 @@ export const Login = () => {
     });
 
     const [errors, setErrors] = useState({});
-    const [flash, setFlash] = useState({ type: '', message: '' });
     const inputEmailRef = useRef(null);
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
@@ -60,22 +59,18 @@ export const Login = () => {
         }
 
         setErrors(newErrors);
-        setFlash({ type: '', message: '' });
 
         if (Object.keys(newErrors).length === 0) {
             try {
                 const response = await axios.post('http://localhost:3333/auth/login', formData);
-                console.log('Resposta da API:', response.data);
 
                 const { token, user } = response.data;
-
-                console.log('Token recebido:', token);
-                console.log('Usuário recebido:', user);
 
                 // Chama login no contexto, que grava localStorage
                 login(user, token);
 
-                setFlash({ type: 'success', message: 'Login realizado com sucesso!' });
+                toast.success('Login realizado com sucesso!');
+
                 setFormData({ email: '', password: '' });
 
                 setTimeout(() => {
@@ -84,7 +79,7 @@ export const Login = () => {
 
             } catch (error) {
                 const msg = error.response?.data?.message || 'Erro ao fazer login';
-                setFlash({ type: 'error', message: msg });
+                toast.error(msg);
                 console.error('Erro no login:', error);
             }
         }
@@ -96,68 +91,58 @@ export const Login = () => {
     };
 
     return (
-        <>
-            {flash.message && (
-                <FlashMessage
-                    type={flash.type}
-                    message={flash.message}
-                    onClose={() => setFlash({ type: '', message: '' })}
-                />
-            )}
+        <Wrapper>
+            <ImageContent>
+                <ImageSlider />
+            </ImageContent>
 
-            <Wrapper>
-                <ImageContent>
-                    <ImageSlider />
-                </ImageContent>
+            <FormSpace>
+                <Head>
+                    <h1>
+                        Conecte-se <span>PeixeControl</span>
+                    </h1>
+                </Head>
+                <FormContainer>
+                    <form onSubmit={handleSubmit}>
+                        <InputContent>
+                            <input
+                                type="email"
+                                name="email"
+                                ref={inputEmailRef}
+                                className="input"
+                                required
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder='Email'
+                            />
+                            <AtSign className="icon" />
+                            {errors.email && <p className="error-message">{errors.email}</p>}
+                        </InputContent>
 
-                <FormSpace>
-                    <Head>
-                        <h1>
-                            Conecte-se <span>PeixeControl</span>
-                        </h1>
-                    </Head>
-                    <FormContainer>
-                        <form onSubmit={handleSubmit}>
-                            <InputContent>
-                                <input
-                                    type="email"
-                                    name="email"
-                                    ref={inputEmailRef}
-                                    className="input"
-                                    required
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    placeholder='Email'
-                                />
-                                <AtSign className="icon" />
-                                {errors.email && <p className="error-message">{errors.email}</p>}
-                            </InputContent>
+                        <InputContent>
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                name="password"
+                                className="input"
+                                required
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder='Senha'
+                            />
+                            <Lock className="icon" />
+                            <span onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                                {showPassword ? <EyeClosed className="eye-c" /> : <Eye className="eye" />}
+                            </span>
+                            {errors.password && <p className="error-message">{errors.password}</p>}
+                        </InputContent>
 
-                            <InputContent>
-                                <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    name="password"
-                                    className="input"
-                                    required
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    placeholder='Senha'
-                                />
-                                <Lock className="icon" />
-                                <span onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
-                                    {showPassword ? <EyeClosed className="eye-c" /> : <Eye className="eye" />}
-                                </span>
-                                {errors.password && <p className="error-message">{errors.password}</p>}
-                            </InputContent>
-
-                            <ButtonSubmit type="submit">Entrar</ButtonSubmit>
-                            <Link to="/register">
-                                Novo no PeixeControl? Cadastre-se
-                            </Link>
-                        </form>
-                    </FormContainer>
-                </FormSpace>
-            </Wrapper>
-        </>
+                        <ButtonSubmit type="submit">Entrar</ButtonSubmit>
+                        <Link to="/register">
+                            Novo no PeixeControl? Cadastre-se
+                        </Link>
+                    </form>
+                </FormContainer>
+            </FormSpace>
+        </Wrapper>
     );
 };

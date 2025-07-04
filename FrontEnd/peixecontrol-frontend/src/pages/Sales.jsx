@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 import {
     SalesContainer,
     Title,
@@ -26,6 +27,7 @@ export default function Sales() {
     const [sales, setSales] = useState([]);
     const [totalVendas, setTotalVendas] = useState(0);
     const [selectedSale, setSelectedSale] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
@@ -53,15 +55,19 @@ export default function Sales() {
 
     async function fetchProducts() {
         try {
+            setLoading(true);
             const response = await api.get('/products');
             setProducts(response.data);
         } catch {
             toast.error('Erro ao carregar produtos');
+        } finally {
+            setLoading(false);
         }
     }
 
     async function fetchSales() {
         try {
+            setLoading(true);
             const response = await api.get('/sales');
             const vendas = response.data;
 
@@ -79,6 +85,8 @@ export default function Sales() {
             setTotalVendas(total);
         } catch {
             toast.error('Erro ao carregar vendas');
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -121,6 +129,7 @@ export default function Sales() {
         const total = cart.reduce((acc, item) => acc + (item.pricePerKg * item.quantitySold), 0);
 
         try {
+            setLoading(true);
             await api.post('/sales', {
                 items: cart,
                 total,
@@ -135,13 +144,13 @@ export default function Sales() {
             setPaymentMethod('Pix');
         } catch {
             toast.error('Erro ao registrar venda');
+        } finally {
+            setLoading(false);
         }
     }
 
     function handleClickFinalizar(e) {
         e.preventDefault();
-
-        // Tocar som e registrar venda
         handleRegisterSale();
     }
 
@@ -161,57 +170,63 @@ export default function Sales() {
         <SalesContainer>
             <Title>Caixa - Registro de Vendas</Title>
 
-            <Form>
-                <Select value={productId} onChange={e => setProductId(e.target.value)}>
-                    <option value="">Selecione um peixe</option>
-                    {products.map(product => (
-                        <option key={product._id} value={product._id}>
-                            {product.name} - R$ {product.pricePerKg}/kg
-                        </option>
-                    ))}
-                </Select>
+            {loading ? (
+                <Loader />
+            ) : (
+                <>
+                    <Form>
+                        <Select value={productId} onChange={e => setProductId(e.target.value)}>
+                            <option value="">Selecione um peixe</option>
+                            {products.map(product => (
+                                <option key={product._id} value={product._id}>
+                                    {product.name} - R$ {product.pricePerKg}/kg
+                                </option>
+                            ))}
+                        </Select>
 
-                <Input
-                    type="number"
-                    placeholder="Quantidade (kg)"
-                    value={quantity}
-                    onChange={e => setQuantity(e.target.value)}
-                    min="0"
-                    step="0.01"
-                />
+                        <Input
+                            type="number"
+                            placeholder="Quantidade (kg)"
+                            value={quantity}
+                            onChange={e => setQuantity(e.target.value)}
+                            min="0"
+                            step="0.01"
+                        />
 
-                <Button type="button" onClick={handleAddToCart}>Adicionar ao Carrinho</Button>
+                        <Button type="button" onClick={handleAddToCart}>Adicionar ao Carrinho</Button>
 
-                <CartList>
-                    {cart.map((item, index) => (
-                        <CartItem key={index}>
-                            {item.productName} - {item.quantitySold} kg - R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
-                            <RemoveButton onClick={() => handleRemoveFromCart(index)}>Remover</RemoveButton>
-                        </CartItem>
-                    ))}
-                </CartList>
+                        <CartList>
+                            {cart.map((item, index) => (
+                                <CartItem key={index}>
+                                    {item.productName} - {item.quantitySold} kg - R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
+                                    <RemoveButton onClick={() => handleRemoveFromCart(index)}>Remover</RemoveButton>
+                                </CartItem>
+                            ))}
+                        </CartList>
 
-                <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
-                    <option value="Pix">Pix</option>
-                    <option value="Cartão de Crédito">Cartão de Crédito</option>
-                    <option value="Cartão de Débito">Cartão de Débito</option>
-                    <option value="Dinheiro">Dinheiro</option>
-                </Select>
+                        <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                            <option value="Pix">Pix</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </Select>
 
-                <Button type="button" onClick={handleClickFinalizar}>Finalizar Venda</Button>
-            </Form>
+                        <Button type="button" onClick={handleClickFinalizar}>Finalizar Venda</Button>
+                    </Form>
 
-            <Title>Vendas do Dia</Title>
-            <CartList>
-                {sales.map((sale, index) => (
-                    <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
-                        <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
-                        <span>R$ {sale.total.toFixed(2)}</span>
-                    </CartItem>
-                ))}
-            </CartList>
+                    <Title>Vendas do Dia</Title>
+                    <CartList>
+                        {sales.map((sale, index) => (
+                            <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
+                                <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
+                                <span>R$ {sale.total.toFixed(2)}</span>
+                            </CartItem>
+                        ))}
+                    </CartList>
 
-            <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
+                    <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
+                </>
+            )}
 
             {selectedSale && (
                 <ModalOverlay ref={overlayRef} onClick={closeModal}>
