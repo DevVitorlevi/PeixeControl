@@ -20,8 +20,10 @@ import {
     ButtonGroup,
     Button,
 } from '../styles/ModalStyles';
+
 import api from '../services/api';
 import { toast } from 'react-toastify';
+import Loader from '../components/Loader';
 
 // 🔊 Som de alerta
 const beepSound = new Audio('/sounds/notify.mp3'); // coloque o som na pasta public/sounds/beep.mp3
@@ -55,7 +57,6 @@ export default function Estoque() {
             if (res.data.length > 0) {
                 res.data.forEach(produto => {
                     if (!toastIdsRef.current.has(produto._id)) {
-                        // 🔊 Tocar som de alerta
                         beepSound.play();
 
                         toast.warn(`Estoque baixo: ${produto.name} (${produto.quantity} kg restantes)`, {
@@ -79,7 +80,7 @@ export default function Estoque() {
 
         const intervalId = setInterval(() => {
             checkLowStock();
-        }, 300000); // 5 minutos = 300000 ms
+        }, 300000); // 5 minutos
 
         return () => clearInterval(intervalId);
     }, []);
@@ -179,9 +180,8 @@ export default function Estoque() {
                 onChange={e => setSearchTerm(e.target.value)}
             />
 
-
             {loading ? (
-                <p>Carregando produtos...</p>
+                <Loader />
             ) : (
                 <Table>
                     <Thead>

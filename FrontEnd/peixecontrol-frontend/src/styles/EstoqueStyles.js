@@ -18,14 +18,14 @@ export const EstoqueContainer = styled.div`
 `;
 
 export const Title = styled.h1`
-  font-size: 2rem;
-  color: #2c3e50;
+  font-size: 3rem;
+  color:#2e64ee;
   margin-bottom: 20px;
   text-align: center;
   font-weight: 700;
 
   @media (min-width: 768px) {
-    font-size: 2.4rem;
+    font-size: 3.4rem;
     margin-bottom: 25px;
   }
 `;
@@ -38,18 +38,12 @@ export const ButtonAdd = styled.button`
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
-  margin-bottom: 20px;
-  align-self: center;
+  align-self: flex-start;
   transition: background-color 0.3s ease;
   font-size: 1.4rem;
 
   &:hover {
     background-color: #1e8449;
-  }
-
-  @media (min-width: 768px) {
-    align-self: flex-end;
-    margin-bottom: 25px;
   }
 `;
 

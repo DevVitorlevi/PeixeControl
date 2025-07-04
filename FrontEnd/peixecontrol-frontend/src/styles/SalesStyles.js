@@ -4,14 +4,14 @@ export const SalesContainer = styled.div`
   width: 60%;
   padding: 20px;
   margin: 0 auto;
-  @media (max-width: 768px) {
-    padding: 10px;
+  @media (max-width: 992px) {
+   width: 100%;
   }
 `;
 
 export const Title = styled.h2`
   font-size: 2.5rem;
-  color: #34495e;
+  color: #2e64ee;
   margin-bottom: 20px;
   text-align: center;
 `;

@@ -4,11 +4,14 @@ export const Container = styled.div`
   max-width: 1200px;
   margin: 20px auto;
   padding: 0 16px;
+  input{
+    color:#188cf8;
+  }
 `;
 
 export const Title = styled.h1`
   font-size: 2rem;
-  color: #084298;
+  color: #2e64ee;
   margin-bottom: 24px;
   text-align: center;
 `;
