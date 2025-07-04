@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
@@ -13,7 +12,7 @@ module.exports = function (req, res, next) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.userId = decoded.id;
-        return next();
+        next();
     } catch (err) {
         return res.status(401).json({ message: 'Token inválido!' });
     }

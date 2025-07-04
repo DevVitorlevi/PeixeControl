@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -14,6 +13,15 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    planType: {
+        type: String,
+        enum: ['vitalicio', 'assinatura'],
+        default: 'assinatura'
+    },
+    subscriptionValidUntil: {
+        type: Date,
+        default: null
     },
     createdAt: {
         type: Date,
