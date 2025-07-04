@@ -14,7 +14,11 @@ export const HeaderContainer = styled.header`
 
 export const UserInfo = styled.span`
   font-weight: bold;
-  text-indent: 15rem;
+  text-indent: 2rem;
+
+  @media (min-width: 768px) {
+    text-indent: 15rem; /* espaço grande no desktop */
+  }
 `;
 
 export const LogoutButton = styled.button`

@@ -8,7 +8,6 @@ export default function Header() {
     return (
         <HeaderContainer>
             <UserInfo>Olá, {user?.name || "Usuário"}</UserInfo>
-            <LogoutButton onClick={logout}>Sair da Conta</LogoutButton>
         </HeaderContainer>
     );
 }
