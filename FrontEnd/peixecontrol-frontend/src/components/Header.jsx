@@ -38,7 +38,7 @@ export default function Header() {
                 <UserInfo>Olá, {user?.name || 'Usuário'}</UserInfo>
 
                 {/* Botão logout visível só em desktop */}
-                <LogoutButtonDesktop onClick={logout}>Sair</LogoutButtonDesktop>
+                <LogoutButtonDesktop onClick={logout}>Sair da Conta</LogoutButtonDesktop>
 
                 {/* Hamburger button mobile */}
                 <HamburgerButton onClick={toggleMenu} aria-label="Menu">
@@ -55,7 +55,7 @@ export default function Header() {
                     <NavLinkStyled to="/movimentacoes" onClick={closeMenu}>Movimentações</NavLinkStyled>
 
                     {/* Botão logout visível só em mobile */}
-                    <LogoutButtonMobile onClick={handleLogout}>Sair</LogoutButtonMobile>
+                    <LogoutButtonMobile onClick={handleLogout}>Sair da Conta</LogoutButtonMobile>
                 </MobileMenu>
             </HeaderContainer>
 
