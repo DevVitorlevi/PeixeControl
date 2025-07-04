@@ -47,6 +47,14 @@ export default function Reports() {
         fetchMonthlySummary();
     }, [selectedMonth]);
 
+    // Este useEffect adiciona as classes open para abrir o modal
+    useEffect(() => {
+        if (selectedSale) {
+            overlayRef.current?.classList.add('open');
+            contentRef.current?.classList.add('open');
+        }
+    }, [selectedSale]);
+
     async function fetchLowStock() {
         try {
             const res = await api.get('/reports/low-stock');
