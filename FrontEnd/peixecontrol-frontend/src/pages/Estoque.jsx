@@ -38,6 +38,7 @@ export default function Estoque() {
     const [editingId, setEditingId] = useState(null);
     const [submitLoading, setSubmitLoading] = useState(false);
 
+    const submitLock = useRef(false);
     const toastIdsRef = useRef(new Set());
 
     async function fetchProdutos() {
@@ -114,12 +115,13 @@ export default function Estoque() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (submitLoading) return;
-
+        if (submitLock.current) return; // Proteção contra múltiplos envios
+        submitLock.current = true; // Trava imediatamente
         setSubmitLoading(true);
 
         if (!form.nome.trim()) {
             toast.error('Nome é obrigatório');
+            submitLock.current = false;
             setSubmitLoading(false);
             return;
         }
@@ -129,12 +131,14 @@ export default function Estoque() {
 
         if (!quantidadeNum || quantidadeNum <= 0) {
             toast.error('Quantidade deve ser maior que zero');
+            submitLock.current = false;
             setSubmitLoading(false);
             return;
         }
 
         if (!precoNum || precoNum <= 0) {
             toast.error('Preço deve ser maior que zero');
+            submitLock.current = false;
             setSubmitLoading(false);
             return;
         }
@@ -159,6 +163,7 @@ export default function Estoque() {
             toast.error('Erro ao salvar produto');
             console.error(error.response?.data || error.message);
         } finally {
+            submitLock.current = false; // Libera o clique
             setSubmitLoading(false);
         }
     }
