@@ -5,7 +5,11 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  planType: { type: String, enum: ['vitalicio', 'assinatura_mensal', 'assinatura_anual'], default: 'assinatura_mensal' },
+  planType: {
+    type: String,
+    enum: ['vitalicio', 'assinatura_mensal', 'assinatura_anual'],
+    default: 'assinatura_mensal'
+},
   subscriptionValidUntil: { type: Date, default: null },
   createdAt: { type: Date, default: Date.now }
 });

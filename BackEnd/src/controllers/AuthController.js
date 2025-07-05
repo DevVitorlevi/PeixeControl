@@ -4,42 +4,52 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     async register(req, res) {
-        const { name, email, password, role, planType, subscriptionValidUntil } = req.body;
+    const { name, email, password, role, planType } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
-        }
+    if (!name || !email || !password) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
+    }
 
-        if (password.length < 6) {
-            return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
-        }
+    if (password.length < 6) {
+        return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
+    }
 
-        if (role && !['user', 'admin'].includes(role)) {
-            return res.status(400).json({ message: 'Role inválido!' });
-        }
+    if (role && !['user', 'admin'].includes(role)) {
+        return res.status(400).json({ message: 'Role inválido!' });
+    }
 
-        if (planType && !['vitalicio', 'assinatura'].includes(planType)) {
-            return res.status(400).json({ message: 'Tipo de plano inválido!' });
-        }
+    if (planType && !['vitalicio', 'assinatura_mensal', 'assinatura_anual'].includes(planType)) {
+        return res.status(400).json({ message: 'Tipo de plano inválido!' });
+    }
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'Email já cadastrado!' });
-        }
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+        return res.status(400).json({ message: 'Email já cadastrado!' });
+    }
 
-        const hashedPassword = await bcrypt.hash(password, 8);
+    const hashedPassword = await bcrypt.hash(password, 8);
 
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role: role || 'user',
-            planType: planType || 'assinatura',
-            subscriptionValidUntil: subscriptionValidUntil || null
-        });
+    let subscriptionValidUntil = null;
 
-        return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
-    },
+    if (planType === 'assinatura_mensal') {
+        subscriptionValidUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 dias
+    } else if (planType === 'assinatura_anual') {
+        subscriptionValidUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // 365 dias
+    } else if (planType === 'vitalicio') {
+        subscriptionValidUntil = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 dias grátis para começar
+    }
+
+    const user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: role || 'user',
+        planType: planType || 'assinatura_mensal',
+        subscriptionValidUntil
+    });
+
+    return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
+},
 
     async login(req, res) {
         const { email, password } = req.body;
