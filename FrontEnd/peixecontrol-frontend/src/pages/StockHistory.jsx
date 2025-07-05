@@ -13,6 +13,7 @@ import {
 } from '../styles/StockHistory';
 import api from '../services/api';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export default function StockHistory() {
     const [movements, setMovements] = useState([]);
@@ -24,49 +25,66 @@ export default function StockHistory() {
         return today.toISOString().split('T')[0]; // formato yyyy-mm-dd
     });
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         async function fetchMovements() {
             try {
                 setLoading(true);
-                const res = await api.get('/stock-history');
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    toast.error('Você precisa estar logado.');
+                    navigate('/login');
+                    return;
+                }
+
+                // Se sua API aceitar filtro por data via query param, envie aqui
+                // Exemplo: /stock-history?date=yyyy-mm-dd
+                const res = await api.get('/stock-history', {
+                    headers: { Authorization: `Bearer ${token}` },
+                    params: { date: selectedDate }
+                });
+
                 setMovements(res.data);
             } catch (error) {
-                toast.error('Erro ao carregar histórico de movimentação.');
+                if (error.response?.status === 401) {
+                    toast.error('Sessão expirada, faça login novamente.');
+                    localStorage.removeItem('token');
+                    navigate('/login');
+                } else if (error.response?.status === 403) {
+                    toast.error('Assinatura expirada. Renove para continuar.');
+                } else {
+                    toast.error('Erro ao carregar histórico de movimentação.');
+                }
             } finally {
                 setLoading(false);
             }
         }
         fetchMovements();
-    }, []);
+    }, [selectedDate, navigate]);
 
-    // Filtrar movimentos pelo dia selecionado
-    const filteredMovements = movements.filter(mov => {
-        const movDate = new Date(mov.date).toISOString().split('T')[0];
-        return movDate === selectedDate;
-    });
+    // Paginação com movimentos filtrados (movements já filtrados pela API via date)
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentMovements = movements.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(movements.length / itemsPerPage);
 
     // Calcular resumo do dia selecionado
-    const totalEntrada = filteredMovements
+    const totalEntrada = movements
         .filter(mov => mov.type.toLowerCase() === 'entrada')
         .reduce((acc, cur) => acc + cur.quantity, 0);
 
-    const totalSaida = filteredMovements
+    const totalSaida = movements
         .filter(mov => mov.type.toLowerCase() === 'saída' || mov.type.toLowerCase() === 'saida')
         .reduce((acc, cur) => acc + cur.quantity, 0);
 
-    // Paginação com movimentos filtrados
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentMovements = filteredMovements.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(filteredMovements.length / itemsPerPage);
-
     function handlePageChange(page) {
-        setCurrentPage(page);
+        if (page >= 1 && page <= totalPages) setCurrentPage(page);
     }
 
     function handleDateChange(e) {
         setSelectedDate(e.target.value);
-        setCurrentPage(1); // resetar página ao mudar data
+        setCurrentPage(1);
     }
 
     return (
@@ -91,7 +109,7 @@ export default function StockHistory() {
 
             {loading ? (
                 <Loader />
-            ) : filteredMovements.length === 0 ? (
+            ) : movements.length === 0 ? (
                 <EmptyMessage>Nenhuma movimentação encontrada para essa data.</EmptyMessage>
             ) : (
                 <>
@@ -107,7 +125,7 @@ export default function StockHistory() {
                             </thead>
                             <tbody>
                                 {currentMovements.map((mov, idx) => (
-                                    <tr key={idx}>
+                                    <tr key={mov._id || idx}>
                                         <td>{new Date(mov.date).toLocaleString()}</td>
                                         <td>{mov.productName}</td>
                                         <td>{mov.type}</td>
