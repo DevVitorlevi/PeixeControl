@@ -2,12 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
+import ReactSelect from 'react-select';
 import {
     SalesContainer,
     Title,
     Form,
     Input,
-    Select,
     Button,
     CartList,
     CartItem,
@@ -19,11 +19,12 @@ import {
     PaginationContainer,
     PaginationButton,
     PaginationPageInfo,
+    Select as StyledSelect // Caso queira usar depois para os outros selects
 } from '../styles/SalesStyles';
 
 export default function Sales() {
     const [products, setProducts] = useState([]);
-    const [productId, setProductId] = useState('');
+    const [selectedProduct, setSelectedProduct] = useState(null);
     const [quantity, setQuantity] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('Pix');
     const [cart, setCart] = useState([]);
@@ -99,12 +100,12 @@ export default function Sales() {
     }
 
     function handleAddToCart() {
-        if (!productId || !quantity || parseFloat(quantity) <= 0) {
+        if (!selectedProduct || !quantity || parseFloat(quantity) <= 0) {
             toast.error('Preencha todos os campos corretamente');
             return;
         }
 
-        const product = products.find(prod => prod._id === productId);
+        const product = products.find(prod => prod._id === selectedProduct.value);
         if (!product) {
             toast.error('Produto inválido');
             return;
@@ -114,11 +115,11 @@ export default function Sales() {
             productId: product._id,
             productName: product.name,
             quantitySold: Number(quantity),
-            pricePerKg: product.pricePerKg
+            pricePerKg: product.pricePerKg,
         };
 
         setCart([...cart, cartItem]);
-        setProductId('');
+        setSelectedProduct(null);
         setQuantity('');
     }
 
@@ -141,7 +142,7 @@ export default function Sales() {
             await api.post('/sales', {
                 items: cart,
                 total,
-                paymentMethod
+                paymentMethod,
             });
 
             toast.success('Venda registrada com sucesso!');
@@ -189,6 +190,12 @@ export default function Sales() {
         setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
     }
 
+    // Opções para react-select
+    const productOptions = products.map(prod => ({
+        value: prod._id,
+        label: `${prod.name} - R$ ${prod.pricePerKg.toFixed(2)}/kg`,
+    }));
+
     return (
         <SalesContainer>
             <Title>Caixa - Registro de Vendas</Title>
@@ -198,14 +205,14 @@ export default function Sales() {
             ) : (
                 <>
                     <Form>
-                        <Select value={productId} onChange={e => setProductId(e.target.value)}>
-                            <option value="">Selecione um peixe</option>
-                            {products.map(product => (
-                                <option key={product._id} value={product._id}>
-                                    {product.name} - R$ {product.pricePerKg}/kg
-                                </option>
-                            ))}
-                        </Select>
+                        <ReactSelect
+                            options={productOptions}
+                            value={selectedProduct}
+                            onChange={setSelectedProduct}
+                            placeholder="Selecione um peixe"
+                            isClearable
+                            noOptionsMessage={() => "Nenhum peixe encontrado"}
+                        />
 
                         <Input
                             type="number"
@@ -227,12 +234,16 @@ export default function Sales() {
                             ))}
                         </CartList>
 
-                        <Select value={paymentMethod} onChange={e => setPaymentMethod(e.target.value)}>
+                        <StyledSelect
+                            as="select"
+                            value={paymentMethod}
+                            onChange={e => setPaymentMethod(e.target.value)}
+                        >
                             <option value="Pix">Pix</option>
                             <option value="Cartão de Crédito">Cartão de Crédito</option>
                             <option value="Cartão de Débito">Cartão de Débito</option>
                             <option value="Dinheiro">Dinheiro</option>
-                        </Select>
+                        </StyledSelect>
 
                         <Button type="button" onClick={handleClickFinalizar}>Finalizar Venda</Button>
                     </Form>
