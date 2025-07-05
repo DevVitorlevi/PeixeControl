@@ -77,37 +77,38 @@ module.exports = {
         });
     }
     ,
-    async registerAdmin(req, res) {
+     async registerAdmin(req, res) {
     try {
-        const { name, email, password } = req.body;
+      const { name, email, password } = req.body;
 
-        if (!name || !email || !password) {
-            return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
-        }
+      if (!name || !email || !password) {
+        return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
+      }
 
-        if (password.length < 6) {
-            return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
-        }
+      if (password.length < 6) {
+        return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
+      }
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: 'Email já cadastrado!' });
-        }
+      const userExists = await User.findOne({ email });
+      if (userExists) {
+        return res.status(400).json({ message: 'Email já cadastrado!' });
+      }
 
-        const hashedPassword = await bcrypt.hash(password, 8);
+      const hashedPassword = await bcrypt.hash(password, 8);
 
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword,
-            role: 'admin',
-            planType: 'vitalicio',
-            subscriptionValidUntil: null
-        });
+      const user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role: 'admin', // força admin aqui
+        planType: 'vitalicio', // admins são vitalícios normalmente
+        subscriptionValidUntil: null,
+      });
 
-        return res.status(201).json({ message: 'Administrador cadastrado com sucesso!', userId: user._id });
+      return res.status(201).json({ message: 'Administrador cadastrado com sucesso!' });
     } catch (error) {
-        return res.status(500).json({ message: 'Erro no servidor ao cadastrar administrador.' });
+      console.error(error);
+      return res.status(500).json({ message: 'Erro no servidor ao cadastrar administrador.' });
     }
-}
+  },
 };
