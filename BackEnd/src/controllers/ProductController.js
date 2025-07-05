@@ -80,13 +80,26 @@ module.exports = {
     async delete(req, res) {
         const { id } = req.params;
 
-        const product = await Product.findOneAndDelete({ _id: id, userId: req.userId });
+        const product = await Product.findOne({ _id: id, userId: req.userId });
 
         if (!product) {
             return res.status(404).json({ message: 'Produto não encontrado!' });
         }
 
-        return res.json({ message: 'Produto deletado com sucesso!' });
+        // Registrar saída antes de deletar
+        if (product.quantity > 0) {
+            await StockMovement.create({
+                userId: req.userId,
+                productId: product._id,
+                productName: product.name,
+                type: 'Saída',
+                quantity: product.quantity
+            });
+        }
+
+        await product.deleteOne();
+
+        return res.json({ message: 'Produto deletado com sucesso e saída registrada!' });
     },
 
     async lowStockAlert(req, res) {
