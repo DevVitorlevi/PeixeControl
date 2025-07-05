@@ -41,7 +41,7 @@ export default function Estoque() {
     const [submitLoading, setSubmitLoading] = useState(false);
 
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 5; // Itens por página
+    const itemsPerPage = 8;
 
     const submitLock = useRef(false);
     const toastIdsRef = useRef(new Set());
