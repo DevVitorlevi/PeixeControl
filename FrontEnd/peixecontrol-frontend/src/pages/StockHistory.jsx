@@ -28,7 +28,7 @@ export default function StockHistory() {
         async function fetchMovements() {
             try {
                 setLoading(true);
-                const res = await api.get('/stock-history'); // ajuste conforme sua rota
+                const res = await api.get('/stock-history');
                 setMovements(res.data);
             } catch (error) {
                 toast.error('Erro ao carregar histórico de movimentação.');

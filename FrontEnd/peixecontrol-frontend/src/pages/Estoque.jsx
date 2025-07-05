@@ -26,7 +26,7 @@ import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
 
 // 🔊 Som de alerta
-const beepSound = new Audio('/sounds/notify.mp3'); // coloque o som na pasta public/sounds/beep.mp3
+const beepSound = new Audio('/sounds/notify.mp3');
 
 export default function Estoque() {
     const [produtos, setProdutos] = useState([]);
@@ -36,6 +36,7 @@ export default function Estoque() {
     const [modalOpen, setModalOpen] = useState(false);
     const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     const toastIdsRef = useRef(new Set());
 
@@ -113,8 +114,13 @@ export default function Estoque() {
     async function handleSubmit(e) {
         e.preventDefault();
 
+        if (submitLoading) return;
+
+        setSubmitLoading(true);
+
         if (!form.nome.trim()) {
             toast.error('Nome é obrigatório');
+            setSubmitLoading(false);
             return;
         }
 
@@ -123,11 +129,13 @@ export default function Estoque() {
 
         if (!quantidadeNum || quantidadeNum <= 0) {
             toast.error('Quantidade deve ser maior que zero');
+            setSubmitLoading(false);
             return;
         }
 
         if (!precoNum || precoNum <= 0) {
             toast.error('Preço deve ser maior que zero');
+            setSubmitLoading(false);
             return;
         }
 
@@ -150,6 +158,8 @@ export default function Estoque() {
         } catch (error) {
             toast.error('Erro ao salvar produto');
             console.error(error.response?.data || error.message);
+        } finally {
+            setSubmitLoading(false);
         }
     }
 
@@ -255,7 +265,9 @@ export default function Estoque() {
                                 <Button $isCancel type="button" onClick={closeModal}>
                                     Cancelar
                                 </Button>
-                                <Button type="submit">{editingId ? 'Salvar' : 'Adicionar'}</Button>
+                                <Button type="submit" disabled={submitLoading}>
+                                    {submitLoading ? 'Salvando...' : editingId ? 'Salvar' : 'Adicionar'}
+                                </Button>
                             </ButtonGroup>
                         </Form>
                     </ModalContainer>
