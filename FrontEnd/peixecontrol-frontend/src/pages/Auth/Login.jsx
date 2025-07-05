@@ -11,7 +11,7 @@ import {
 
 import { AtSign, Eye, EyeClosed, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../../services/api'; // 🔥 Aqui você deve importar seu axios configurado
+import api from '../../services/api';
 import { ImageSlider } from '../../components/ImageSlide';
 import { AuthContext } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
@@ -23,6 +23,9 @@ export const Login = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const submitLock = useRef(false); // 🔒 Proteção imediata
+
     const inputEmailRef = useRef(null);
     const navigate = useNavigate();
     const { login } = useContext(AuthContext);
@@ -49,6 +52,10 @@ export const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (submitLock.current) return; // 🔒 Proteção contra múltiplos cliques
+        submitLock.current = true;
+        setLoading(true);
+
         const newErrors = {};
 
         if (!emailRegex.test(formData.email)) {
@@ -66,7 +73,6 @@ export const Login = () => {
 
                 const { token, user } = response.data;
 
-                // Chama login no contexto, que grava localStorage
                 login(user, token);
 
                 toast.success('Login realizado com sucesso!');
@@ -81,7 +87,13 @@ export const Login = () => {
                 const msg = error.response?.data?.message || 'Erro ao fazer login';
                 toast.error(msg);
                 console.error('Erro no login:', error);
+            } finally {
+                submitLock.current = false; // 🔓 Libera o clique
+                setLoading(false);
             }
+        } else {
+            submitLock.current = false; // 🔓 Libera o clique se houver erro de validação
+            setLoading(false);
         }
     };
 
@@ -136,7 +148,10 @@ export const Login = () => {
                             {errors.password && <p className="error-message">{errors.password}</p>}
                         </InputContent>
 
-                        <ButtonSubmit type="submit">Entrar</ButtonSubmit>
+                        <ButtonSubmit type="submit" disabled={loading}>
+                            {loading ? 'Entrando...' : 'Entrar'}
+                        </ButtonSubmit>
+
                         <Link to="/register">
                             Novo no PeixeControl? Cadastre-se
                         </Link>
