@@ -392,3 +392,38 @@ export const TopActionsContainer = styled.div`
     }
   }
 `;
+export const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+`;
+
+export const PaginationButton = styled.button`
+  background-color: #084298;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+
+  &:hover:not(:disabled) {
+    background-color: #2c80b4;
+  }
+
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+  }
+`;
+
+export const PaginationPageInfo = styled.span`
+  font-weight: 700;
+  font-size: 1rem;
+  color: #084298;
+  align-self: center;
+`;
+

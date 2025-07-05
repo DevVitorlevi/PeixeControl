@@ -18,7 +18,10 @@ import {
     GridContainer,
     Card,
     FullWidthCard,
-    TopActionsContainer
+    TopActionsContainer,
+    PaginationContainer,
+    PaginationButton,
+    PaginationPageInfo,
 } from '../styles/ReportStyles';
 
 export default function Reports() {
@@ -188,7 +191,7 @@ export default function Reports() {
                         <option value="daily">Relatório Diário</option>
                         <option value="monthly">Relatório Mensal</option>
                     </select>
-                    <button onClick={handleExport}>Exportar PDF</button>
+                    <PaginationButton onClick={handleExport}>Exportar PDF</PaginationButton>
                 </div>
             </TopActionsContainer>
 
@@ -252,11 +255,11 @@ export default function Reports() {
                         </CartList>
 
                         {totalPages > 1 && (
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
-                                <button onClick={goToPreviousPage} disabled={currentPage === 1}>Anterior</button>
-                                <span>{currentPage} / {totalPages}</span>
-                                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Próximo</button>
-                            </div>
+                            <PaginationContainer>
+                                <PaginationButton onClick={goToPreviousPage} disabled={currentPage === 1}>Anterior</PaginationButton>
+                                <PaginationPageInfo>{currentPage} / {totalPages}</PaginationPageInfo>
+                                <PaginationButton onClick={goToNextPage} disabled={currentPage === totalPages}>Próximo</PaginationButton>
+                            </PaginationContainer>
                         )}
 
                         {salesHistory.length > 0 && (
