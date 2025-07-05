@@ -1,25 +1,25 @@
 import styled from 'styled-components';
 
 export const EstoqueContainer = styled.div`
-  margin: 0 auto; /* centraliza */
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
 
   @media (max-width: 600px) {
-    width: 100%; /* deixa o conteúdo mais compacto no desktop */
+    width: 100%;
   }
-  @media screen and (min-width:768px){
+  @media screen and (min-width:768px) {
     width: 80%;
-  } 
-  @media screen and (min-width:820px){
+  }
+  @media screen and (min-width:820px) {
     width: 80%;
   }
 `;
 
 export const Title = styled.h1`
   font-size: 3rem;
-  color:#2e64ee;
+  color: #2e64ee;
   margin-bottom: 20px;
   text-align: center;
   font-weight: 700;
@@ -65,14 +65,13 @@ export const Table = styled.table`
 export const Thead = styled.thead`
   background-color: #084298;
   color: white;
-  `;
+`;
 
 export const Th = styled.th`
   padding: 12px 10px;
   border: 1px solid #ddd;
   text-align: left;
   font-weight: 700;
-
 
   @media (min-width: 768px) {
     padding: 14px 12px;
@@ -132,5 +131,51 @@ export const SearchInput = styled.input`
 
   @media (min-width: 768px) {
     max-width: 400px;
+  }
+`;
+
+/* 🔥 PAGINAÇÃO 🔥 */
+
+export const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+`;
+
+export const PaginationButton = styled.button`
+  background-color: #2980b9;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+
+  &:hover:enabled {
+    background-color: #1c5980;
+  }
+
+  &:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+  }
+`;
+
+export const PaginationNumber = styled.button`
+  background-color: ${({ $active }) => ($active ? '#2e64ee' : '#f0f0f0')};
+  color: ${({ $active }) => ($active ? 'white' : '#333')};
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: ${({ $active }) => ($active ? '#1c47b5' : '#ddd')};
   }
 `;

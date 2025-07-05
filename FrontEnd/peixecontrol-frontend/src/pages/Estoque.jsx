@@ -9,6 +9,9 @@ import {
     ButtonAdd,
     ActionButton,
     SearchInput,
+    PaginationContainer,
+    PaginationButton,
+    PaginationNumber
 } from '../styles/EstoqueStyles';
 
 import {
@@ -25,7 +28,6 @@ import api from '../services/api';
 import { toast } from 'react-toastify';
 import Loader from '../components/Loader';
 
-// 🔊 Som de alerta
 const beepSound = new Audio('/sounds/notify.mp3');
 
 export default function Estoque() {
@@ -37,6 +39,9 @@ export default function Estoque() {
     const [form, setForm] = useState({ nome: '', quantidade: '', preco: '' });
     const [editingId, setEditingId] = useState(null);
     const [submitLoading, setSubmitLoading] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5; // Itens por página
 
     const submitLock = useRef(false);
     const toastIdsRef = useRef(new Set());
@@ -82,7 +87,7 @@ export default function Estoque() {
 
         const intervalId = setInterval(() => {
             checkLowStock();
-        }, 300000); // 5 minutos
+        }, 300000);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -115,8 +120,8 @@ export default function Estoque() {
     async function handleSubmit(e) {
         e.preventDefault();
 
-        if (submitLock.current) return; // Proteção contra múltiplos envios
-        submitLock.current = true; // Trava imediatamente
+        if (submitLock.current) return;
+        submitLock.current = true;
         setSubmitLoading(true);
 
         if (!form.nome.trim()) {
@@ -163,7 +168,7 @@ export default function Estoque() {
             toast.error('Erro ao salvar produto');
             console.error(error.response?.data || error.message);
         } finally {
-            submitLock.current = false; // Libera o clique
+            submitLock.current = false;
             setSubmitLoading(false);
         }
     }
@@ -183,6 +188,17 @@ export default function Estoque() {
         produto.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const totalPages = Math.ceil(produtosFiltrados.length / itemsPerPage);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = produtosFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+
+    function goToPage(page) {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    }
+
     return (
         <EstoqueContainer>
             <Title>Estoque</Title>
@@ -198,42 +214,66 @@ export default function Estoque() {
             {loading ? (
                 <Loader />
             ) : (
-                <Table>
-                    <Thead>
-                        <tr>
-                            <Th>Nome do Peixe</Th>
-                            <Th>Quantidade (kg)</Th>
-                            <Th>Preço por kg (R$)</Th>
-                            <Th>Ações</Th>
-                        </tr>
-                    </Thead>
-                    <tbody>
-                        {produtosFiltrados.length > 0 ? (
-                            produtosFiltrados.map(produto => (
-                                <tr key={produto._id}>
-                                    <Td>{produto.name}</Td>
-                                    <Td>{produto.quantity}</Td>
-                                    <Td>{produto.pricePerKg.toFixed(2)}</Td>
-                                    <Td>
-                                        <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
-                                        <ActionButton
-                                            className="delete"
-                                            onClick={() => handleDelete(produto._id)}
-                                        >
-                                            Excluir
-                                        </ActionButton>
+                <>
+                    <Table>
+                        <Thead>
+                            <tr>
+                                <Th>Nome do Peixe</Th>
+                                <Th>Quantidade (kg)</Th>
+                                <Th>Preço por kg (R$)</Th>
+                                <Th>Ações</Th>
+                            </tr>
+                        </Thead>
+                        <tbody>
+                            {currentItems.length > 0 ? (
+                                currentItems.map(produto => (
+                                    <tr key={produto._id}>
+                                        <Td>{produto.name}</Td>
+                                        <Td>{produto.quantity}</Td>
+                                        <Td>{produto.pricePerKg.toFixed(2)}</Td>
+                                        <Td>
+                                            <ActionButton onClick={() => openEditModal(produto)}>Editar</ActionButton>
+                                            <ActionButton
+                                                className="delete"
+                                                onClick={() => handleDelete(produto._id)}
+                                            >
+                                                Excluir
+                                            </ActionButton>
+                                        </Td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <Td colSpan={4} style={{ textAlign: 'center' }}>
+                                        Nenhum peixe encontrado.
                                     </Td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <Td colSpan={4} style={{ textAlign: 'center' }}>
-                                    Nenhum peixe encontrado.
-                                </Td>
-                            </tr>
-                        )}
-                    </tbody>
-                </Table>
+                            )}
+                        </tbody>
+                    </Table>
+
+                    {totalPages > 1 && (
+                        <PaginationContainer>
+                            <PaginationButton onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+                                Anterior
+                            </PaginationButton>
+
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <PaginationNumber
+                                    key={index + 1}
+                                    onClick={() => goToPage(index + 1)}
+                                    $active={currentPage === index + 1}
+                                >
+                                    {index + 1}
+                                </PaginationNumber>
+                            ))}
+
+                            <PaginationButton onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages}>
+                                Próximo
+                            </PaginationButton>
+                        </PaginationContainer>
+                    )}
+                </>
             )}
 
             {modalOpen && (
