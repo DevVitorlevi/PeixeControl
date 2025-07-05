@@ -49,10 +49,23 @@ export default function Estoque() {
     async function fetchProdutos() {
         try {
             setLoading(true);
-            const response = await api.get('/products');
+            const token = localStorage.getItem('token');
+            const response = await api.get('/products', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             setProdutos(response.data);
         } catch (error) {
-            toast.error('Erro ao carregar produtos');
+            if (error.response?.status === 403) {
+                alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else {
+                toast.error('Erro ao carregar produtos');
+            }
         } finally {
             setLoading(false);
         }
@@ -60,7 +73,10 @@ export default function Estoque() {
 
     async function checkLowStock() {
         try {
-            const res = await api.get('/reports/low-stock');
+            const token = localStorage.getItem('token');
+            const res = await api.get('/reports/low-stock', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             if (res.data.length > 0) {
                 res.data.forEach(produto => {
                     if (!toastIdsRef.current.has(produto._id)) {
@@ -76,8 +92,18 @@ export default function Estoque() {
                     }
                 });
             }
-        } catch {
-            console.error('Erro ao verificar estoque baixo');
+        } catch (error) {
+            if (error.response?.status === 403) {
+                alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else {
+                console.error('Erro ao verificar estoque baixo');
+            }
         }
     }
 
@@ -87,7 +113,7 @@ export default function Estoque() {
 
         const intervalId = setInterval(() => {
             checkLowStock();
-        }, 300000);
+        }, 300000); // 5 minutos
 
         return () => clearInterval(intervalId);
     }, []);
@@ -155,18 +181,34 @@ export default function Estoque() {
         };
 
         try {
+            const token = localStorage.getItem('token');
+
             if (editingId) {
-                await api.patch(`/products/${editingId}`, produtoEnviado);
+                await api.patch(`/products/${editingId}`, produtoEnviado, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 toast.success('Produto atualizado com sucesso!');
             } else {
-                await api.post('/products', produtoEnviado);
+                await api.post('/products', produtoEnviado, {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
                 toast.success('Produto adicionado com sucesso!');
             }
             closeModal();
             fetchProdutos();
         } catch (error) {
-            toast.error('Erro ao salvar produto');
-            console.error(error.response?.data || error.message);
+            if (error.response?.status === 403) {
+                alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else {
+                toast.error('Erro ao salvar produto');
+                console.error(error.response?.data || error.message);
+            }
         } finally {
             submitLock.current = false;
             setSubmitLoading(false);
@@ -176,11 +218,24 @@ export default function Estoque() {
     async function handleDelete(id) {
         if (!window.confirm('Tem certeza que deseja excluir este produto?')) return;
         try {
-            await api.delete(`/products/${id}`);
+            const token = localStorage.getItem('token');
+            await api.delete(`/products/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             toast.success('Produto excluído com sucesso!');
             fetchProdutos();
         } catch (error) {
-            toast.error('Erro ao excluir produto');
+            if (error.response?.status === 403) {
+                alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else if (error.response?.status === 401) {
+                alert('Sessão expirada. Faça login novamente.');
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+            } else {
+                toast.error('Erro ao excluir produto');
+            }
         }
     }
 

@@ -1,3 +1,4 @@
+// middlewares/subscriptionCheck.js
 const User = require('../models/User');
 
 module.exports = async function (req, res, next) {
@@ -8,8 +9,14 @@ module.exports = async function (req, res, next) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        if (user.planType === 'assinatura' && user.subscriptionValidUntil && new Date() > user.subscriptionValidUntil) {
-            return res.status(403).json({ message: 'Assinatura expirada!' });
+        // Liberar vitalício
+        if (user.planType === 'vitalicio') {
+            return next();
+        }
+
+        // Bloquear assinatura expirada
+        if (user.subscriptionValidUntil && new Date() > user.subscriptionValidUntil) {
+            return res.status(403).json({ message: 'Assinatura expirada! Por favor, renove sua assinatura.' });
         }
 
         return next();

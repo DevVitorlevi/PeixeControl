@@ -34,7 +34,6 @@ export default function Reports() {
     const [exportType, setExportType] = useState('daily');
     const [loading, setLoading] = useState(false);
 
-    // Paginação
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -48,7 +47,7 @@ export default function Reports() {
     useEffect(() => {
         fetchLowStock();
         fetchSalesHistory();
-        setCurrentPage(1); // resetar pagina quando mudar data
+        setCurrentPage(1);
     }, [selectedDate]);
 
     useEffect(() => {
@@ -64,20 +63,26 @@ export default function Reports() {
 
     async function fetchLowStock() {
         try {
-            const res = await api.get('/reports/low-stock');
+            const token = localStorage.getItem('token');
+            const res = await api.get('/reports/low-stock', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setLowStock(res.data);
-        } catch {
-            toast.error('Erro ao carregar produtos com estoque baixo');
+        } catch (error) {
+            handleApiError(error);
         }
     }
 
     async function fetchSalesHistory() {
         try {
             setLoading(true);
-            const res = await api.get(`/reports/sales-history?date=${selectedDate.toISOString().split('T')[0]}`);
+            const token = localStorage.getItem('token');
+            const res = await api.get(`/reports/sales-history?date=${selectedDate.toISOString().split('T')[0]}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setSalesHistory(res.data);
-        } catch {
-            toast.error('Erro ao carregar histórico de vendas');
+        } catch (error) {
+            handleApiError(error);
         } finally {
             setLoading(false);
         }
@@ -86,14 +91,32 @@ export default function Reports() {
     async function fetchMonthlySummary() {
         try {
             setLoading(true);
+            const token = localStorage.getItem('token');
             const month = selectedMonth.getMonth() + 1;
             const year = selectedMonth.getFullYear();
-            const res = await api.get(`/reports/monthly-summary?month=${month}&year=${year}`);
+            const res = await api.get(`/reports/monthly-summary?month=${month}&year=${year}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             setMonthlySummary(res.data);
-        } catch {
-            toast.error('Erro ao carregar resumo mensal');
+        } catch (error) {
+            handleApiError(error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    function handleApiError(error) {
+        if (error.response?.status === 403) {
+            alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        } else if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        } else {
+            toast.error('Erro ao carregar os dados.');
+            console.error(error.response?.data || error.message);
         }
     }
 
@@ -118,7 +141,6 @@ export default function Reports() {
         { totalValue: 0, totalKg: 0 }
     );
 
-    // PAGINAÇÃO
     const totalPages = Math.ceil(salesHistory.length / itemsPerPage);
     const currentSalesPage = salesHistory.slice(
         (currentPage - 1) * itemsPerPage,

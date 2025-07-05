@@ -19,7 +19,7 @@ import {
     PaginationContainer,
     PaginationButton,
     PaginationPageInfo,
-    Select as StyledSelect // Caso queira usar depois para os outros selects
+    Select as StyledSelect
 } from '../styles/SalesStyles';
 
 export default function Sales() {
@@ -33,7 +33,6 @@ export default function Sales() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    // Paginação
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
@@ -49,7 +48,7 @@ export default function Sales() {
     useEffect(() => {
         if (selectedSale) {
             if (overlayRef.current && contentRef.current) {
-                void overlayRef.current.offsetWidth; // forçar reflow para animação
+                void overlayRef.current.offsetWidth;
                 overlayRef.current.classList.add('open');
                 contentRef.current.classList.add('open');
             }
@@ -64,10 +63,13 @@ export default function Sales() {
     async function fetchProducts() {
         try {
             setLoading(true);
-            const response = await api.get('/products');
+            const token = localStorage.getItem('token');
+            const response = await api.get('/products', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             setProducts(response.data);
-        } catch {
-            toast.error('Erro ao carregar produtos');
+        } catch (error) {
+            handleApiError(error);
         } finally {
             setLoading(false);
         }
@@ -76,7 +78,10 @@ export default function Sales() {
     async function fetchSales() {
         try {
             setLoading(true);
-            const response = await api.get('/sales');
+            const token = localStorage.getItem('token');
+            const response = await api.get('/sales', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             const vendas = response.data;
 
             const hoje = new Date();
@@ -88,14 +93,29 @@ export default function Sales() {
             });
 
             setSales(vendasHoje);
-            setCurrentPage(1); // resetar página quando recarregar vendas
+            setCurrentPage(1);
 
             const total = vendasHoje.reduce((acc, sale) => acc + sale.total, 0);
             setTotalVendas(total);
-        } catch {
-            toast.error('Erro ao carregar vendas');
+        } catch (error) {
+            handleApiError(error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    function handleApiError(error) {
+        if (error.response?.status === 403) {
+            alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        } else if (error.response?.status === 401) {
+            alert('Sessão expirada. Faça login novamente.');
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        } else {
+            toast.error('Erro ao carregar os dados.');
+            console.error(error.response?.data || error.message);
         }
     }
 
@@ -139,10 +159,13 @@ export default function Sales() {
 
         try {
             setLoading(true);
+            const token = localStorage.getItem('token');
             await api.post('/sales', {
                 items: cart,
                 total,
                 paymentMethod,
+            }, {
+                headers: { Authorization: `Bearer ${token}` },
             });
 
             toast.success('Venda registrada com sucesso!');
@@ -151,8 +174,8 @@ export default function Sales() {
             fetchSales();
             setCart([]);
             setPaymentMethod('Pix');
-        } catch {
-            toast.error('Erro ao registrar venda');
+        } catch (error) {
+            handleApiError(error);
         } finally {
             setLoading(false);
         }
@@ -175,7 +198,6 @@ export default function Sales() {
         }
     }
 
-    // PAGINAÇÃO
     const totalPages = Math.ceil(sales.length / itemsPerPage);
     const currentSalesPage = sales.slice(
         (currentPage - 1) * itemsPerPage,
@@ -190,7 +212,6 @@ export default function Sales() {
         setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
     }
 
-    // Opções para react-select
     const productOptions = products.map(prod => ({
         value: prod._id,
         label: `${prod.name} - R$ ${prod.pricePerKg.toFixed(2)}/kg`,
