@@ -8,6 +8,8 @@ const UserController = require('../controllers/UserController');
 
 // Rota protegida para pegar perfil
 router.get('/me', auth, subscriptionCheck, UserController.getProfile);
+router.patch('/:id', auth, UserController.updatePlan);
+
 
 // Rotas administrativas
 router.get('/', auth, adminAuth, UserController.listUsers);

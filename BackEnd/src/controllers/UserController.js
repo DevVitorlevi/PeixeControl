@@ -124,5 +124,36 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ message: 'Erro ao atualizar assinatura' });
         }
+    },
+    async updatePlan(req, res) {
+    try {
+        const { id } = req.params;
+        const { planType, subscriptionValidUntil } = req.body;
+
+        if (!['vitalicio', 'assinatura'].includes(planType)) {
+            return res.status(400).json({ message: 'Plano inválido!' });
+        }
+
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+        user.planType = planType;
+
+        if (planType === 'assinatura') {
+            if (!subscriptionValidUntil) {
+                return res.status(400).json({ message: 'Data de validade é obrigatória para assinatura!' });
+            }
+            user.subscriptionValidUntil = new Date(subscriptionValidUntil);
+        } else {
+            user.subscriptionValidUntil = null;
+        }
+
+        await user.save();
+
+        return res.json({ message: 'Plano atualizado com sucesso!' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Erro ao atualizar plano' });
     }
+}
+
 };

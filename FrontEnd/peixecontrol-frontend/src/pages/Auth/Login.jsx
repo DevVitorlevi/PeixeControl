@@ -11,7 +11,7 @@ import {
 
 import { AtSign, Eye, EyeClosed, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api'; // 🔥 Aqui você deve importar seu axios configurado
 import { ImageSlider } from '../../components/ImageSlide';
 import { AuthContext } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
@@ -62,7 +62,7 @@ export const Login = () => {
 
         if (Object.keys(newErrors).length === 0) {
             try {
-                const response = await axios.post('http://localhost:3333/auth/login', formData);
+                const response = await api.post('/auth/login', formData);
 
                 const { token, user } = response.data;
 
