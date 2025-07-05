@@ -31,6 +31,10 @@ export default function Reports() {
     const [exportType, setExportType] = useState('daily');
     const [loading, setLoading] = useState(false);
 
+    // Paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
 
@@ -41,13 +45,13 @@ export default function Reports() {
     useEffect(() => {
         fetchLowStock();
         fetchSalesHistory();
+        setCurrentPage(1); // resetar pagina quando mudar data
     }, [selectedDate]);
 
     useEffect(() => {
         fetchMonthlySummary();
     }, [selectedMonth]);
 
-    // Este useEffect adiciona as classes open para abrir o modal
     useEffect(() => {
         if (selectedSale) {
             overlayRef.current?.classList.add('open');
@@ -110,6 +114,21 @@ export default function Reports() {
         },
         { totalValue: 0, totalKg: 0 }
     );
+
+    // PAGINAÇÃO
+    const totalPages = Math.ceil(salesHistory.length / itemsPerPage);
+    const currentSalesPage = salesHistory.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    function goToPreviousPage() {
+        setCurrentPage(prev => (prev > 1 ? prev - 1 : prev));
+    }
+
+    function goToNextPage() {
+        setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
+    }
 
     function exportPDF(data, fileName) {
         if (data.length === 0) {
@@ -219,8 +238,8 @@ export default function Reports() {
                         />
                         <Title>Vendas no Dia Selecionado</Title>
                         <CartList>
-                            {salesHistory.length > 0 ? (
-                                salesHistory.map((sale, index) => (
+                            {currentSalesPage.length > 0 ? (
+                                currentSalesPage.map((sale, index) => (
                                     <CartItem key={index} onClick={() => handleOpenModal(sale)}>
                                         <span>Venda de {sale.items.length} item(s)</span>
                                         <span>R$ {sale.total.toFixed(2)}</span>
@@ -231,6 +250,14 @@ export default function Reports() {
                                 <p>Nenhuma venda registrada neste dia</p>
                             )}
                         </CartList>
+
+                        {totalPages > 1 && (
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                                <button onClick={goToPreviousPage} disabled={currentPage === 1}>Anterior</button>
+                                <span>{currentPage} / {totalPages}</span>
+                                <button onClick={goToNextPage} disabled={currentPage === totalPages}>Próximo</button>
+                            </div>
+                        )}
 
                         {salesHistory.length > 0 && (
                             <DailySummaryCard>

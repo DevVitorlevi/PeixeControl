@@ -29,6 +29,10 @@ export default function Sales() {
     const [selectedSale, setSelectedSale] = useState(null);
     const [loading, setLoading] = useState(false);
 
+    // Paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
     const overlayRef = useRef(null);
     const contentRef = useRef(null);
     const saleSound = useRef(new Audio('/sounds/DIN.mp3')).current;
@@ -41,7 +45,7 @@ export default function Sales() {
     useEffect(() => {
         if (selectedSale) {
             if (overlayRef.current && contentRef.current) {
-                void overlayRef.current.offsetWidth;
+                void overlayRef.current.offsetWidth; // forçar reflow para animação
                 overlayRef.current.classList.add('open');
                 contentRef.current.classList.add('open');
             }
@@ -80,6 +84,7 @@ export default function Sales() {
             });
 
             setSales(vendasHoje);
+            setCurrentPage(1); // resetar página quando recarregar vendas
 
             const total = vendasHoje.reduce((acc, sale) => acc + sale.total, 0);
             setTotalVendas(total);
@@ -166,6 +171,21 @@ export default function Sales() {
         }
     }
 
+    // PAGINAÇÃO
+    const totalPages = Math.ceil(sales.length / itemsPerPage);
+    const currentSalesPage = sales.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
+    function goToPreviousPage() {
+        setCurrentPage(prev => (prev > 1 ? prev - 1 : prev));
+    }
+
+    function goToNextPage() {
+        setCurrentPage(prev => (prev < totalPages ? prev + 1 : prev));
+    }
+
     return (
         <SalesContainer>
             <Title>Caixa - Registro de Vendas</Title>
@@ -216,15 +236,30 @@ export default function Sales() {
 
                     <Title>Vendas do Dia</Title>
                     <CartList>
-                        {sales.map((sale, index) => (
-                            <CartItem key={index} onClick={() => handleSaleClick(sale)} style={{ cursor: 'pointer' }}>
-                                <span>Venda de {sale.items ? sale.items.length : 1} item(s)</span>
-                                <span>R$ {sale.total.toFixed(2)}</span>
-                            </CartItem>
-                        ))}
+                        {currentSalesPage.length > 0 ? (
+                            currentSalesPage.map((sale, index) => (
+                                <CartItem
+                                    key={index}
+                                    onClick={() => handleSaleClick(sale)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    Venda de {sale.items ? sale.items.length : 1} item(s) - R$ {sale.total.toFixed(2)}
+                                </CartItem>
+                            ))
+                        ) : (
+                            <p>Nenhuma venda registrada hoje</p>
+                        )}
                     </CartList>
 
-                    <Totalizer>Total do Dia: R$ {totalVendas.toFixed(2)}</Totalizer>
+                    {totalPages > 1 && (
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
+                            <button onClick={goToPreviousPage} disabled={currentPage === 1}>Anterior</button>
+                            <span>{currentPage} / {totalPages}</span>
+                            <button onClick={goToNextPage} disabled={currentPage === totalPages}>Próximo</button>
+                        </div>
+                    )}
+
+                    <Totalizer>Total vendido hoje: R$ {totalVendas.toFixed(2)}</Totalizer>
                 </>
             )}
 
@@ -232,17 +267,17 @@ export default function Sales() {
                 <ModalOverlay ref={overlayRef} onClick={closeModal}>
                     <ModalContent ref={contentRef} onClick={e => e.stopPropagation()}>
                         <CloseButton onClick={closeModal}>X</CloseButton>
-                        <h3>Detalhes da Venda</h3>
+                        <h2>Detalhes da Venda</h2>
+                        <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
+                        <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
                         <ul>
-                            {selectedSale.items.map((item, index) => (
-                                <li key={index}>
+                            {selectedSale.items.map((item, idx) => (
+                                <li key={idx}>
                                     {item.productName} — {item.quantitySold} kg — R$ {(item.pricePerKg * item.quantitySold).toFixed(2)}
                                 </li>
                             ))}
                         </ul>
-                        <p>Total: R$ {selectedSale.total.toFixed(2)}</p>
-                        <p>Forma de Pagamento: {selectedSale.paymentMethod}</p>
-                        <p>Data: {new Date(selectedSale.saleDate).toLocaleString()}</p>
+                        <p><strong>Total: R$ {selectedSale.total.toFixed(2)}</strong></p>
                     </ModalContent>
                 </ModalOverlay>
             )}
