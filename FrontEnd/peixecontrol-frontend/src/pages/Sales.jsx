@@ -15,7 +15,10 @@ import {
     Totalizer,
     ModalOverlay,
     ModalContent,
-    CloseButton
+    CloseButton,
+    PaginationContainer,
+    PaginationButton,
+    PaginationPageInfo,
 } from '../styles/SalesStyles';
 
 export default function Sales() {
@@ -252,11 +255,15 @@ export default function Sales() {
                     </CartList>
 
                     {totalPages > 1 && (
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginTop: '10px' }}>
-                            <button onClick={goToPreviousPage} disabled={currentPage === 1}>Anterior</button>
-                            <span>{currentPage} / {totalPages}</span>
-                            <button onClick={goToNextPage} disabled={currentPage === totalPages}>Próximo</button>
-                        </div>
+                        <PaginationContainer>
+                            <PaginationButton onClick={goToPreviousPage} disabled={currentPage === 1}>
+                                Anterior
+                            </PaginationButton>
+                            <PaginationPageInfo>{currentPage} / {totalPages}</PaginationPageInfo>
+                            <PaginationButton onClick={goToNextPage} disabled={currentPage === totalPages}>
+                                Próximo
+                            </PaginationButton>
+                        </PaginationContainer>
                     )}
 
                     <Totalizer>Total vendido hoje: R$ {totalVendas.toFixed(2)}</Totalizer>
