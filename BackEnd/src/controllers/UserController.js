@@ -162,20 +162,23 @@ module.exports = {
     }
   },
 
-  async cancelAccess(req, res) {
-    try {
-      const { id } = req.params;
-      const user = await User.findById(id);
-      if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+async cancelAccess(req, res) {
+  try {
+    const { id } = req.params;
 
-      // Cancela definindo a validade para data atual, assim assinatura fica expirada
-      user.subscriptionValidUntil = new Date();
-      await user.save();
+    const user = await User.findById(id);
+    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-      return res.json({ message: 'Acesso do usuário cancelado com sucesso!' });
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
-    }
+    // Ajusta para cancelar o acesso corretamente
+    user.planType = 'cancelado';              // Define o planType como cancelado
+    user.subscriptionValidUntil = null;       // Remove validade
+
+    await user.save();
+
+    return res.json({ message: 'Acesso do usuário cancelado com sucesso!' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
   }
+}
 };
