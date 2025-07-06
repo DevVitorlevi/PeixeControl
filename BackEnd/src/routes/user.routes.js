@@ -3,7 +3,6 @@ const router = express.Router();
 
 const auth = require('../middlewares/auth');
 const subscriptionCheck = require('../middlewares/subscriptionCheck');
-const adminAuth = require('../middlewares/adminAuth');
 const UserController = require('../controllers/UserController');
 
 // Rota protegida para pegar perfil
