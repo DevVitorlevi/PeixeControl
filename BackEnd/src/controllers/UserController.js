@@ -169,14 +169,15 @@ module.exports = {
     }
   },
 
-  async cancelAccess(req, res) {
+   async cancelAccess(req, res) {
     try {
       const { id } = req.params;
 
       const user = await User.findById(id);
       if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-      user.planStatus = 'cancelado'; // Troca aqui
+      user.planStatus = 'cancelado';
+      user.previousValidUntil = user.subscriptionValidUntil; // ✅ Salva a validade antiga
       user.subscriptionValidUntil = null;
 
       await user.save();
@@ -187,20 +188,24 @@ module.exports = {
       return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
     }
   },
+
   async reactivateAccess(req, res) {
     try {
-        const { id } = req.params;
+      const { id } = req.params;
 
-        const user = await User.findById(id);
-        if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+      const user = await User.findById(id);
+      if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-        user.planStatus = 'ativo';
-        await user.save();
+      user.planStatus = 'ativo';
+      user.subscriptionValidUntil = user.previousValidUntil; // ✅ Restaura a validade antiga
+      user.previousValidUntil = null; // ✅ Limpa o campo de backup
 
-        return res.json({ message: 'Acesso do usuário reativado com sucesso!' });
+      await user.save();
+
+      return res.json({ message: 'Acesso do usuário reativado com sucesso!' });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Erro ao reativar acesso do usuário' });
+      console.error(error);
+      return res.status(500).json({ message: 'Erro ao reativar acesso do usuário' });
     }
-}
+  }
 };

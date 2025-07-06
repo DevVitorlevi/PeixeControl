@@ -11,13 +11,15 @@ const UserSchema = new mongoose.Schema({
     default: 'assinatura_mensal'
   },
 
-  planStatus: {  // ✅ Novo campo para controle de status
+  planStatus: {  
     type: String,
-    enum: ['ativo', 'cancelado'], // Plano pode estar ativo ou cancelado
+    enum: ['ativo', 'cancelado'], 
     default: 'ativo'
   },
 
   subscriptionValidUntil: { type: Date, default: null },
+
+  previousValidUntil: { type: Date, default: null }, // ✅ Adicionado
 
   createdAt: { type: Date, default: Date.now }
 });
