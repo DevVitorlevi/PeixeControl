@@ -34,18 +34,17 @@ export default function StockHistory() {
                 const token = localStorage.getItem('token');
                 if (!token) {
                     toast.error('Você precisa estar logado.');
-                    navigate('/login');
+                    navigate('/');
                     return;
                 }
 
-                // Se sua API aceitar filtro por data via query param, envie aqui
-                // Exemplo: /stock-history?date=yyyy-mm-dd
                 const res = await api.get('/stock-history', {
                     headers: { Authorization: `Bearer ${token}` },
                     params: { date: selectedDate }
                 });
 
                 setMovements(res.data);
+                setCurrentPage(1); // Resetar página ao mudar data
             } catch (error) {
                 if (error.response?.status === 401) {
                     toast.error('Sessão expirada, faça login novamente.');
@@ -63,13 +62,13 @@ export default function StockHistory() {
         fetchMovements();
     }, [selectedDate, navigate]);
 
-    // Paginação com movimentos filtrados (movements já filtrados pela API via date)
+    // Paginação
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentMovements = movements.slice(indexOfFirstItem, indexOfLastItem);
     const totalPages = Math.ceil(movements.length / itemsPerPage);
 
-    // Calcular resumo do dia selecionado
+    // Resumo do dia, já que a API retorna só o dia selecionado
     const totalEntrada = movements
         .filter(mov => mov.type.toLowerCase() === 'entrada')
         .reduce((acc, cur) => acc + cur.quantity, 0);
@@ -84,7 +83,6 @@ export default function StockHistory() {
 
     function handleDateChange(e) {
         setSelectedDate(e.target.value);
-        setCurrentPage(1);
     }
 
     return (
@@ -92,6 +90,7 @@ export default function StockHistory() {
             <Title>Histórico de Movimentação do Estoque</Title>
 
             <DatePickerContainer>
+                <label htmlFor="">Selecione uma Data</label>
                 <input
                     type="date"
                     id="datePicker"
