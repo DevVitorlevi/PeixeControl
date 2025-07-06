@@ -41,6 +41,7 @@ module.exports = {
         password: hashedPassword,
         role: role || 'user',
         planType: planType || 'assinatura_mensal',
+        planStatus: 'ativo', // Novo campo
         subscriptionValidUntil,
       });
 
@@ -68,6 +69,10 @@ module.exports = {
         return res.status(400).json({ message: 'Email ou senha inválidos!' });
       }
 
+      if (user.planStatus === 'cancelado') {
+        return res.status(403).json({ message: 'Sua assinatura está cancelada. Acesso negado.' });
+      }
+
       const token = jwt.sign(
         { id: user._id, role: user.role, planType: user.planType },
         process.env.JWT_SECRET,
@@ -81,6 +86,7 @@ module.exports = {
           email: user.email,
           role: user.role,
           planType: user.planType,
+          planStatus: user.planStatus,
           subscriptionValidUntil: user.subscriptionValidUntil,
         },
         token,
@@ -122,6 +128,7 @@ module.exports = {
       if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
       user.subscriptionValidUntil = new Date(newValidUntil);
+      user.planStatus = 'ativo'; // Reativa o plano
       await user.save();
 
       return res.json({ message: 'Assinatura atualizada com sucesso!' });
@@ -135,7 +142,6 @@ module.exports = {
       const { id } = req.params;
       const { planType, subscriptionValidUntil } = req.body;
 
-      // Aceita mensal, anual e vitalício
       if (!['vitalicio', 'assinatura_mensal', 'assinatura_anual'].includes(planType)) {
         return res.status(400).json({ message: 'Plano inválido!' });
       }
@@ -144,6 +150,7 @@ module.exports = {
       if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
       user.planType = planType;
+      user.planStatus = 'ativo'; // Ativa o plano novamente
 
       if (planType === 'assinatura_mensal' || planType === 'assinatura_anual') {
         if (!subscriptionValidUntil) {
@@ -162,23 +169,22 @@ module.exports = {
     }
   },
 
-async cancelAccess(req, res) {
-  try {
-    const { id } = req.params;
+  async cancelAccess(req, res) {
+    try {
+      const { id } = req.params;
 
-    const user = await User.findById(id);
-    if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+      const user = await User.findById(id);
+      if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-    // Ajusta para cancelar o acesso corretamente
-    user.planType = 'cancelado';              
-    user.subscriptionValidUntil = null;      
+      user.planStatus = 'cancelado'; // Troca aqui
+      user.subscriptionValidUntil = null;
 
-    await user.save();
+      await user.save();
 
-    return res.json({ message: 'Acesso do usuário cancelado com sucesso!' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
+      return res.json({ message: 'Acesso do usuário cancelado com sucesso!' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
+    }
   }
-}
 };
