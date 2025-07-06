@@ -12,5 +12,7 @@ router.get('/', UserController.listUsers);
 router.post('/renew-subscription', UserController.renewSubscription);
 router.patch('/:id/cancel-access', UserController.cancelAccess);
 router.patch('/:id', UserController.updatePlan);
+router.patch('/:id/reactivate-access', UserController.reactivateAccess);
+
 
 module.exports = router;

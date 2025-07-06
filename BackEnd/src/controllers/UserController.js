@@ -186,5 +186,21 @@ module.exports = {
       console.error(error);
       return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
     }
-  }
+  },
+  async reactivateAccess(req, res) {
+    try {
+        const { id } = req.params;
+
+        const user = await User.findById(id);
+        if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
+
+        user.planStatus = 'ativo';
+        await user.save();
+
+        return res.json({ message: 'Acesso do usuário reativado com sucesso!' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Erro ao reativar acesso do usuário' });
+    }
+}
 };
