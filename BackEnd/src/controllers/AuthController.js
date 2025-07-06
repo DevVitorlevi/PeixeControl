@@ -51,41 +51,46 @@ module.exports = {
     return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
 },
 
-    async login(req, res) {
-        const { email, password } = req.body;
+   async login(req, res) {
+    const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email e senha são obrigatórios!' });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'Email ou senha inválidos!' });
-        }
-
-        const passwordMatch = await bcrypt.compare(password, user.password);
-        if (!passwordMatch) {
-            return res.status(400).json({ message: 'Email ou senha inválidos!' });
-        }
-
-        const token = jwt.sign(
-            { id: user._id, role: user.role, planType: user.planType },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' }
-        );
-
-        return res.json({
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                planType: user.planType,
-                subscriptionValidUntil: user.subscriptionValidUntil
-            },
-            token
-        });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email e senha são obrigatórios!' });
     }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+        return res.status(400).json({ message: 'Email ou senha inválidos!' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+        return res.status(400).json({ message: 'Email ou senha inválidos!' });
+    }
+
+    // 🔒 BLOQUEIO DE ACESSO PARA PLANOS CANCELADOS
+    if (user.planStatus === 'cancelado') {
+        return res.status(403).json({ message: 'Sua assinatura está cancelada. Acesso negado.' });
+    }
+
+    const token = jwt.sign(
+        { id: user._id, role: user.role, planType: user.planType },
+        process.env.JWT_SECRET,
+        { expiresIn: '7d' }
+    );
+
+    return res.json({
+        user: {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            planType: user.planType,
+            subscriptionValidUntil: user.subscriptionValidUntil
+        },
+        token
+    });
+}
     ,
      async registerAdmin(req, res) {
     try {
