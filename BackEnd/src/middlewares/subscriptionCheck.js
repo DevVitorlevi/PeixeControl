@@ -8,12 +8,14 @@ module.exports = async function (req, res, next) {
             return res.status(404).json({ message: 'Usuário não encontrado' });
         }
 
-        // Bloquear usuários com assinatura mensal ou anual expirada
-        if (
-            (user.planType === 'assinatura_mensal' || user.planType === 'assinatura_anual') &&
-            user.subscriptionValidUntil &&
-            new Date() > user.subscriptionValidUntil
-        ) {
+        // Se o usuário estiver cancelado, bloqueia o acesso
+        if (user.planType === 'cancelado') {
+            return res.status(403).json({ message: 'Acesso cancelado. Entre em contato com o administrador.' });
+        }
+
+        // Verifica validade para assinaturas mensais ou anuais
+        if ((user.planType === 'assinatura_mensal' || user.planType === 'assinatura_anual') &&
+            user.subscriptionValidUntil && new Date() > user.subscriptionValidUntil) {
             return res.status(403).json({ message: 'Assinatura expirada!' });
         }
 

@@ -8,8 +8,9 @@ const UserController = require('../controllers/UserController');
 // Rota protegida para pegar perfil
 router.get('/me', auth, subscriptionCheck, UserController.getProfile);
 // routes.js
-router.patch('/:id', subscriptionCheck, UserController.updatePlan);
 router.get('/', UserController.listUsers);
-router.post('/renew-subscription', subscriptionCheck, UserController.renewSubscription);
+router.post('/renew-subscription', UserController.renewSubscription);
 router.patch('/:id/cancel-access', UserController.cancelAccess);
+router.patch('/:id', UserController.updatePlan);
+
 module.exports = router;
