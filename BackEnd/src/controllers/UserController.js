@@ -170,8 +170,8 @@ async cancelAccess(req, res) {
     if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
     // Ajusta para cancelar o acesso corretamente
-    user.planType = 'cancelado';              // Define o planType como cancelado
-    user.subscriptionValidUntil = null;       // Remove validade
+    user.planType = 'cancelado';              
+    user.subscriptionValidUntil = null;      
 
     await user.save();
 
