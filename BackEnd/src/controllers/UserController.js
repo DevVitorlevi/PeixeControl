@@ -167,19 +167,15 @@ module.exports = {
 async cancelAccess(req, res) {
   try {
     const { id } = req.params;
-
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
-    // Aqui você pode fazer do jeito que preferir:
-    // Por exemplo, mudar planType para "cancelado"
-    user.planType = 'cancelado';
-    user.subscriptionValidUntil = null; // Remove validade
-
+    user.subscriptionValidUntil = new Date(); // Define como expirada imediatamente
     await user.save();
 
     return res.json({ message: 'Acesso do usuário cancelado com sucesso!' });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: 'Erro ao cancelar acesso do usuário' });
   }
 }
