@@ -108,11 +108,11 @@ export default function Sales() {
         if (error.response?.status === 403) {
             alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            window.location.href = '/';
         } else if (error.response?.status === 401) {
             alert('Sessão expirada. Faça login novamente.');
             localStorage.removeItem('token');
-            window.location.href = '/login';
+            window.location.href = '/';
         } else {
             toast.error('Erro ao carregar os dados.');
             console.error(error.response?.data || error.message);

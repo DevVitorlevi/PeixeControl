@@ -58,11 +58,11 @@ export default function Estoque() {
             if (error.response?.status === 403) {
                 alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (error.response?.status === 401) {
                 alert('Sessão expirada. Faça login novamente.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else {
                 toast.error('Erro ao carregar produtos');
             }
@@ -96,11 +96,11 @@ export default function Estoque() {
             if (error.response?.status === 403) {
                 alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (error.response?.status === 401) {
                 alert('Sessão expirada. Faça login novamente.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else {
                 console.error('Erro ao verificar estoque baixo');
             }
@@ -200,11 +200,11 @@ export default function Estoque() {
             if (error.response?.status === 403) {
                 alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (error.response?.status === 401) {
                 alert('Sessão expirada. Faça login novamente.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else {
                 toast.error('Erro ao salvar produto');
                 console.error(error.response?.data || error.message);
@@ -228,11 +228,11 @@ export default function Estoque() {
             if (error.response?.status === 403) {
                 alert('Sua assinatura expirou! Faça login e renove sua assinatura.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else if (error.response?.status === 401) {
                 alert('Sessão expirada. Faça login novamente.');
                 localStorage.removeItem('token');
-                window.location.href = '/login';
+                window.location.href = '/';
             } else {
                 toast.error('Erro ao excluir produto');
             }

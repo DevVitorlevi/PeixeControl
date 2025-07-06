@@ -50,7 +50,7 @@ export default function StockHistory() {
                 if (error.response?.status === 401) {
                     toast.error('Sessão expirada, faça login novamente.');
                     localStorage.removeItem('token');
-                    navigate('/login');
+                    navigate('/');
                 } else if (error.response?.status === 403) {
                     toast.error('Assinatura expirada. Renove para continuar.');
                 } else {

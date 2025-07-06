@@ -17,14 +17,10 @@ import { AuthContext } from '../../contexts/AuthContext';
 import { toast } from 'react-toastify';
 
 export const Login = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-    });
-
+    const [formData, setFormData] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const submitLock = useRef(false); // 🔒 Proteção imediata
+    const submitLock = useRef(false);
 
     const inputEmailRef = useRef(null);
     const navigate = useNavigate();
@@ -39,42 +35,40 @@ export const Login = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
         if (name === 'email') {
-            setErrors(prev => ({
+            setErrors((prev) => ({
                 ...prev,
-                email: emailRegex.test(value) ? '' : 'E-mail inválido'
+                email: emailRegex.test(value) ? '' : 'E-mail inválido',
             }));
+        }
+
+        if (name === 'password' && value.length >= 6) {
+            setErrors((prev) => ({ ...prev, password: '' }));
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (submitLock.current) return; // 🔒 Proteção contra múltiplos cliques
+        if (submitLock.current) return;
         submitLock.current = true;
         setLoading(true);
 
-        const newErrors = {};
+        const validationErrors = {};
 
-        if (!emailRegex.test(formData.email)) {
-            newErrors.email = 'E-mail inválido';
-        }
-        if (formData.password.length < 6) {
-            newErrors.password = 'Senha muito curta';
-        }
+        if (!emailRegex.test(formData.email)) validationErrors.email = 'E-mail inválido';
+        if (formData.password.length < 6) validationErrors.password = 'Senha muito curta';
 
-        setErrors(newErrors);
+        setErrors(validationErrors);
 
-        if (Object.keys(newErrors).length === 0) {
+        if (Object.keys(validationErrors).length === 0) {
             try {
                 const response = await api.post('/auth/login', formData);
-
                 const { token, user } = response.data;
 
                 login(user, token);
-
                 toast.success('Login realizado com sucesso!');
 
                 setFormData({ email: '', password: '' });
@@ -82,25 +76,22 @@ export const Login = () => {
                 setTimeout(() => {
                     navigate('/estoque');
                 }, 1500);
-
             } catch (error) {
                 const msg = error.response?.data?.message || 'Erro ao fazer login';
                 toast.error(msg);
                 console.error('Erro no login:', error);
             } finally {
-                submitLock.current = false; // 🔓 Libera o clique
+                submitLock.current = false;
                 setLoading(false);
             }
         } else {
-            submitLock.current = false; // 🔓 Libera o clique se houver erro de validação
+            submitLock.current = false;
             setLoading(false);
         }
     };
 
     const [showPassword, setShowPassword] = useState(false);
-    const togglePasswordVisibility = () => {
-        setShowPassword(prev => !prev);
-    };
+    const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
     return (
         <Wrapper>
@@ -114,8 +105,9 @@ export const Login = () => {
                         Conecte-se <span>PeixeControl</span>
                     </h1>
                 </Head>
+
                 <FormContainer>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit} noValidate>
                         <InputContent>
                             <input
                                 type="email"
@@ -125,7 +117,8 @@ export const Login = () => {
                                 required
                                 value={formData.email}
                                 onChange={handleChange}
-                                placeholder='Email'
+                                placeholder="Email"
+                                autoComplete="username"
                             />
                             <AtSign className="icon" />
                             {errors.email && <p className="error-message">{errors.email}</p>}
@@ -139,10 +132,20 @@ export const Login = () => {
                                 required
                                 value={formData.password}
                                 onChange={handleChange}
-                                placeholder='Senha'
+                                placeholder="Senha"
+                                autoComplete="current-password"
                             />
                             <Lock className="icon" />
-                            <span onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                            <span
+                                onClick={togglePasswordVisibility}
+                                style={{ cursor: 'pointer' }}
+                                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') togglePasswordVisibility();
+                                }}
+                            >
                                 {showPassword ? <EyeClosed className="eye-c" /> : <Eye className="eye" />}
                             </span>
                             {errors.password && <p className="error-message">{errors.password}</p>}
@@ -152,9 +155,7 @@ export const Login = () => {
                             {loading ? 'Entrando...' : 'Entrar'}
                         </ButtonSubmit>
 
-                        <Link to="/register">
-                            Novo no PeixeControl? Cadastre-se
-                        </Link>
+                        <Link to="/register">Novo no PeixeControl? Cadastre-se</Link>
                     </form>
                 </FormContainer>
             </FormSpace>
