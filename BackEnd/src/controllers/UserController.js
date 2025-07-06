@@ -5,51 +5,58 @@ const jwt = require('jsonwebtoken');
 module.exports = {
   async register(req, res) {
     try {
-      const { name, email, password, planType, role } = req.body;
+        const { name, email, password, planType, role } = req.body;
 
-      if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
-      }
-      if (password.length < 6) {
-        return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
-      }
+        if (!name || !email || !password) {
+            return res.status(400).json({ message: 'Todos os campos são obrigatórios!' });
+        }
+        if (password.length < 6) {
+            return res.status(400).json({ message: 'A senha deve ter no mínimo 6 caracteres!' });
+        }
 
-      const userExists = await User.findOne({ email });
-      if (userExists) {
-        return res.status(400).json({ message: 'Email já cadastrado!' });
-      }
+        const userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: 'Email já cadastrado!' });
+        }
 
-      const hashedPassword = await bcrypt.hash(password, 8);
+        const hashedPassword = await bcrypt.hash(password, 8);
 
-      let subscriptionValidUntil = null;
-      const now = new Date();
-      const trialDays = 7;
+        let subscriptionValidUntil = null;
+        const now = new Date();
+        const trialDays = 7;
 
-      if (planType === 'assinatura_mensal') {
-        subscriptionValidUntil = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000 + 30 * 24 * 60 * 60 * 1000);
-      } else if (planType === 'assinatura_anual') {
-        subscriptionValidUntil = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000 + 365 * 24 * 60 * 60 * 1000);
-      } else if (planType === 'vitalicio') {
-        subscriptionValidUntil = null;
-      } else {
-        return res.status(400).json({ message: 'Plano inválido!' });
-      }
+        // Adicionar dias de teste
+        let trialEndDate = new Date();
+        trialEndDate.setDate(trialEndDate.getDate() + trialDays);
 
-      const user = await User.create({
-        name,
-        email,
-        password: hashedPassword,
-        role: role || 'user',
-        planType: planType || 'assinatura_mensal',
-        planStatus: 'ativo', // Novo campo
-        subscriptionValidUntil,
-      });
+        if (planType === 'assinatura_mensal') {
+            subscriptionValidUntil = new Date(trialEndDate);
+            subscriptionValidUntil.setMonth(subscriptionValidUntil.getMonth() + 1);
+        } else if (planType === 'assinatura_anual') {
+            subscriptionValidUntil = new Date(trialEndDate);
+            subscriptionValidUntil.setFullYear(subscriptionValidUntil.getFullYear() + 1);
+        } else if (planType === 'vitalicio') {
+            subscriptionValidUntil = null;
+        } else {
+            return res.status(400).json({ message: 'Plano inválido!' });
+        }
 
-      return res.status(201).json({ message: 'Usuário cadastrado com sucesso!', userId: user._id });
+        const user = await User.create({
+            name,
+            email,
+            password: hashedPassword,
+            role: role || 'user',
+            planType: planType || 'assinatura_mensal',
+            planStatus: 'ativo',
+            subscriptionValidUntil,
+        });
+
+        return res.status(201).json({ message: 'Usuário cadastrado com sucesso!', userId: user._id });
     } catch (error) {
-      return res.status(500).json({ message: 'Erro no servidor ao cadastrar usuário.' });
+        return res.status(500).json({ message: 'Erro no servidor ao cadastrar usuário.' });
     }
-  },
+}
+,
 
   async login(req, res) {
     try {
