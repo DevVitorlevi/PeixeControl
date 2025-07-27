@@ -44,13 +44,17 @@ Ajudar o dono da peixaria a ter **controle total do estoque**, registrar vendas,
 - Relatórios prontos para análise ou impressão (PDF)
 
 ---
+Confira o sistema funcionando no link:  
+[https://peixe-control.vercel.app/](https://peixe-control.vercel.app/)
+
+---
 
 ### 🛠️ Tecnologias Utilizadas
 
 | Tecnologia           | Descrição                                     |
-|----------------------|-----------------------------------------------|
+|----------------------|----------------------------------------------|
 | **ReactJS**          | Framework Front-End                           |
-| **Styled Components**| Biblioteca para estilização CSS-in-JS em React|
+| **Styled Components**| Biblioteca para estilização CSS-in-JS em React |
 | **Node.js**          | Runtime do back-end                           |
 | **Express.js**       | Framework para rotas e APIs                   |
 | **MongoDB**          | Banco de dados NoSQL                          |
