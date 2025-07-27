@@ -45,8 +45,11 @@ Ajudar o dono da peixaria a ter **controle total do estoque**, registrar vendas,
 
 ---
 Confira o sistema funcionando no link:  
-[https://peixe-control.vercel.app/](https://peixe-control.vercel.app/)
+🌐 [https://peixe-control.vercel.app/](https://peixe-control.vercel.app/)
 
+🔑 **Login de teste:**  
+- 📧 **Email:** bompeixe1@gmail.com  
+- 🔒 **Senha:** Peixaria123
 ---
 
 ### 🛠️ Tecnologias Utilizadas
