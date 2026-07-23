@@ -44,11 +44,11 @@ Ajudar o dono da peixaria a ter **controle total do estoque**, registrar vendas,
 - Relatórios prontos para análise ou impressão (PDF)
 
 ---
-Confira o sistema funcionando no link:  
+Confira o sistema funcionando no link:
 🌐 [https://peixe-control.vercel.app/](https://peixe-control.vercel.app/)
 
-🔑 **Login de teste:**  
-- 📧 **Email:** bompeixe1@gmail.com  
+🔑 **Login de teste:**
+- 📧 **Email:** bompeixe1@gmail.com
 - 🔒 **Senha:** Peixaria123
 ---
 
@@ -57,13 +57,9 @@ Confira o sistema funcionando no link:
 | Tecnologia           | Descrição                                     |
 |----------------------|----------------------------------------------|
 | **ReactJS**          | Framework Front-End                           |
-| **Styled Components**| Biblioteca para estilização CSS-in-JS em React |
+| **Tailwind CSS**     | Framework de Estilização                      |
+| **ShadCN/UI**        |                                               |
 | **Node.js**          | Runtime do back-end                           |
 | **Express.js**       | Framework para rotas e APIs                   |
 | **MongoDB**          | Banco de dados NoSQL                          |
 | **JWT**              | Autenticação segura                           |
-| **Postman**          | Testes de rotas e APIs                        |       
-| **bcrypt**           | Criptografia de senhas                        | 
-| **dotenv**           | Configuração de variáveis de ambiente         |
-
-
