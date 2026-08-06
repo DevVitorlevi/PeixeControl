@@ -1,5 +1,6 @@
 import { formatCurrency, formatKg } from "@/lib/formatters";
 import { LowStockBadge } from "../LowStockBadge/LowStockBadge";
+import { EditProductDialog } from "../EditProductDialog/EditProductDialog";
 import type { Product } from "@/types/stock";
 
 interface ProductListItemProps {
@@ -20,17 +21,20 @@ export function ProductListItem({
     >
       <div className="flex items-start justify-between gap-2">
         <span className="font-medium text-foreground">{product.name}</span>
-        {isLowStock ? (
-          <LowStockBadge />
-        ) : (
-          <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <span
-              className="h-1.5 w-1.5 rounded-full bg-success"
-              aria-hidden="true"
-            />
-            Normal
-          </span>
-        )}
+        <div className="flex items-center gap-1">
+          {isLowStock ? (
+            <LowStockBadge />
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-success"
+                aria-hidden="true"
+              />
+              Normal
+            </span>
+          )}
+          <EditProductDialog product={product} />
+        </div>
       </div>
       <div className="flex items-center justify-between text-sm">
         <span className="text-muted-foreground">Quantidade</span>
