@@ -4,7 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
-  useSyncExternalStore,
+  useEffect,
+  useMemo,
+  useState,
   type ReactNode,
 } from "react";
 import type { AuthUser } from "@/types/auth";
@@ -12,12 +14,12 @@ import type { AuthUser } from "@/types/auth";
 const TOKEN_KEY = "peixecontrol:token";
 const USER_KEY = "peixecontrol:user";
 
-interface AuthSnapshot {
+interface AuthState {
   user: AuthUser | null;
   token: string | null;
 }
 
-interface AuthContextValue extends AuthSnapshot {
+interface AuthContextValue extends AuthState {
   isHydrating: boolean;
   isAuthenticated: boolean;
   signIn: (user: AuthUser, token: string) => void;
@@ -26,94 +28,96 @@ interface AuthContextValue extends AuthSnapshot {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
-const listeners = new Set<() => void>();
-
-function emitChange() {
-  for (const listener of listeners) listener();
-}
-
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    listeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-
-function getSnapshot(): AuthSnapshot {
-  const storedToken = localStorage.getItem(TOKEN_KEY);
-  const storedUser = localStorage.getItem(USER_KEY);
-
-  if (!storedToken || !storedUser) {
-    return { user: null, token: null };
+function getInitialState(): AuthState {
+  if (typeof window === "undefined") {
+    return {
+      user: null,
+      token: null,
+    };
   }
 
   try {
-    return { user: JSON.parse(storedUser) as AuthUser, token: storedToken };
+    const token = localStorage.getItem(TOKEN_KEY);
+    const user = localStorage.getItem(USER_KEY);
+
+    if (!token || !user) {
+      return {
+        user: null,
+        token: null,
+      };
+    }
+
+    return {
+      token,
+      user: JSON.parse(user) as AuthUser,
+    };
   } catch {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
-    return { user: null, token: null };
+
+    return {
+      user: null,
+      token: null,
+    };
   }
 }
 
-function getServerSnapshot(): AuthSnapshot {
-  return { user: null, token: null };
-}
-
-function persistAuth(user: AuthUser, token: string) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-  emitChange();
-}
-
-function clearAuth() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-  emitChange();
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const { user, token } = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getServerSnapshot,
-  );
-  const isHydrating = useSyncExternalStore(
-    () => () => {},
-    () => false,
-    () => true,
-  );
+  const [auth, setAuth] = useState<AuthState>(getInitialState);
 
-  const signIn = useCallback((nextUser: AuthUser, nextToken: string) => {
-    persistAuth(nextUser, nextToken);
+  const signIn = useCallback((user: AuthUser, token: string) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+    setAuth({
+      user,
+      token,
+    });
   }, []);
 
   const signOut = useCallback(() => {
-    clearAuth();
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+
+    setAuth({
+      user: null,
+      token: null,
+    });
   }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        isHydrating,
-        isAuthenticated: Boolean(token && user),
-        signIn,
-        signOut,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  useEffect(() => {
+    const onStorage = () => {
+      setAuth(getInitialState());
+    };
+
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      user: auth.user,
+      token: auth.token,
+      isAuthenticated: Boolean(auth.user && auth.token),
+      isHydrating: false,
+      signIn,
+      signOut,
+    }),
+    [auth, signIn, signOut],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth deve ser usado dentro de um AuthProvider");
   }
+
   return context;
 }

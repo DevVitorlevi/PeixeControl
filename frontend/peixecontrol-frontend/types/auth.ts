@@ -16,3 +16,10 @@ export interface LoginResponse {
   user: AuthUser;
   token: string;
 }
+
+export interface RegisterInput {
+  name: string;
+  email: string;
+  password: string;
+  role: UserRole;
+}

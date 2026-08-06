@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { authService } from "@/service/auth";
+import { authService } from "@/services/auth";
 import { useAuth } from "@/hooks/useAuth";
 import type { LoginInput } from "@/types/auth";
 
