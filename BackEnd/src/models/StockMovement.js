@@ -1,5 +1,32 @@
 const mongoose = require("mongoose");
 
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     StockMovement:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *         userId:
+ *           type: string
+ *         productId:
+ *           type: string
+ *         productName:
+ *           type: string
+ *           example: Tilápia
+ *         type:
+ *           type: string
+ *           enum: [Entrada, Saída]
+ *         quantity:
+ *           type: number
+ *           example: 5
+ *         date:
+ *           type: string
+ *           format: date-time
+ */
+
 const StockMovementSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
