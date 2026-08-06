@@ -1,8 +1,8 @@
 "use client";
 
 import { useDeferredValue, useMemo, useState } from "react";
-import { useProducts } from "@/hooks/useProducts";
-import { useLowStockProducts } from "@/hooks/useLowStockProducts";
+import { useProducts } from "../../hooks/useProducts";
+import { useLowStockProducts } from "../../hooks/useLowStockProducts";
 import { useLowStockSoundAlert } from "@/hooks/useLowStockSoundAlert";
 import { ProductSearchInput } from "../ProductSearchInput/ProductSearchInput";
 import { ProductTable } from "../ProductTable/ProductTable";
@@ -57,11 +57,12 @@ export function ProductList() {
         <>
           <ProductTable products={filteredProducts} lowStockIds={lowStockIds} />
           <ul className="flex flex-col gap-3 md:hidden">
-            {filteredProducts.map((product) => (
+            {filteredProducts.map((product, index) => (
               <ProductListItem
                 key={product._id}
                 product={product}
                 isLowStock={lowStockIds.has(product._id)}
+                index={index}
               />
             ))}
           </ul>
