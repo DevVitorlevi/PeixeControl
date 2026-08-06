@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { toast } from "sonner";
 import { Loader2, Plus } from "lucide-react";
 
@@ -16,20 +15,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useCreateProduct } from "@/hooks/useCreateProduct";
+import { useCreateProduct } from "../../hooks/useCreateProduct";
 import { ProductFormFields } from "../ProductFormFields/ProductFormFields";
-
-const productSchema = z.object({
-  name: z.string().min(1, "Informe o nome do produto"),
-  quantity: z
-    .number({ error: "Informe a quantidade" })
-    .min(0, "Quantidade não pode ser negativa"),
-  pricePerKg: z
-    .number({ error: "Informe o preço por kg" })
-    .positive("Preço deve ser maior que zero"),
-});
-
-export type ProductFormValues = z.infer<typeof productSchema>;
+import {
+  productSchema,
+  type ProductFormValues,
+} from "@/lib/validations/edit-product";
 
 export function CreateProductDialog() {
   const [open, setOpen] = useState(false);
@@ -105,7 +96,7 @@ export function CreateProductDialog() {
                       className="h-4 w-4 animate-spin"
                       aria-hidden="true"
                     />
-                    Salvando...
+                    Salvando…
                   </>
                 ) : (
                   "Salvar produto"
