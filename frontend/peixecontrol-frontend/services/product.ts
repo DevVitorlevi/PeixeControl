@@ -16,4 +16,9 @@ export const productService = {
     const { data } = await api.post<Product>("/products", input);
     return data;
   },
+
+  async update(id: string, input: ProductInput): Promise<Product> {
+    const { data } = await api.patch<Product>(`/products/${id}`, input);
+    return data;
+  },
 };
