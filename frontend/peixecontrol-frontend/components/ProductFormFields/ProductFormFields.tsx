@@ -3,7 +3,7 @@
 import type { UseFormRegister, FieldErrors } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { ProductFormValues } from "../CreateProductDialog/CreateProductDialog";
+import type { ProductFormValues } from "@/lib/validations/edit-product";
 
 interface ProductFormFieldsProps {
   register: UseFormRegister<ProductFormValues>;
@@ -21,6 +21,7 @@ export function ProductFormFields({
         <Input
           id="name"
           type="text"
+          autoComplete="off"
           placeholder="Ex: Tilápia"
           aria-invalid={Boolean(errors.name)}
           aria-describedby={errors.name ? "name-error" : undefined}
