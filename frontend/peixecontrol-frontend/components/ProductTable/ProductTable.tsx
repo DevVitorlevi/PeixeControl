@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency, formatKg } from "@/lib/formatters";
 import { LowStockBadge } from "../LowStockBadge/LowStockBadge";
+import { EditProductDialog } from "../EditProductDialog/EditProductDialog";
 import type { Product } from "@/types/stock";
 
 interface ProductTableProps {
@@ -25,6 +26,7 @@ export function ProductTable({ products, lowStockIds }: ProductTableProps) {
             <TableHead>Quantidade</TableHead>
             <TableHead>Preço/kg</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -63,6 +65,9 @@ export function ProductTable({ products, lowStockIds }: ProductTableProps) {
                       Normal
                     </span>
                   )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <EditProductDialog product={product} />
                 </TableCell>
               </TableRow>
             );
