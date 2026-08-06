@@ -18,42 +18,39 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useLogin } from "@/hooks/useLogin";
+import { useRegister } from "@/hooks/useRegister";
 
-const loginSchema = z.object({
+const registerSchema = z.object({
+  name: z.string().min(1, "Informe o nome"),
   email: z.string().min(1, "Informe o e-mail").email("E-mail inválido"),
-  password: z.string().min(1, "Informe a senha"),
+  password: z.string().min(6, "A senha precisa ter no mínimo 6 caracteres"),
 });
 
-type LoginFormData = z.infer<typeof loginSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
 
-interface LoginFormProps {
-  defaultEmail?: string;
-}
-
-export function LoginForm({ defaultEmail }: LoginFormProps) {
+export function RegisterForm() {
   const router = useRouter();
-  const loginMutation = useLogin();
+  const registerMutation = useRegister();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: defaultEmail ?? "", password: "" },
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: { name: "", email: "", password: "" },
   });
 
-  function onSubmit(data: LoginFormData) {
-    loginMutation.mutate(data, {
+  function onSubmit(data: RegisterFormData) {
+    registerMutation.mutate(data, {
       onSuccess: () => {
-        toast.success("Login realizado com sucesso");
-        router.replace("/");
+        toast.success("Conta criada! Faça login para continuar.");
+        router.replace(`/login?email=${encodeURIComponent(data.email)}`);
       },
       onError: (error) => {
         const message =
           (error as { response?: { data?: { message?: string } } })?.response
-            ?.data?.message ?? "E-mail ou senha inválidos";
+            ?.data?.message ?? "Não foi possível criar a conta";
         toast.error(message);
       },
     });
@@ -72,9 +69,11 @@ export function LoginForm({ defaultEmail }: LoginFormProps) {
           >
             <Fish className="h-5 w-5" aria-hidden="true" />
           </div>
-          <CardTitle className="font-heading">Entrar no PeixeControl</CardTitle>
+          <CardTitle className="font-heading">
+            Criar conta no PeixeControl
+          </CardTitle>
           <CardDescription>
-            Acesse com seu e-mail e senha cadastrados.
+            Cadastre-se para começar a gerenciar sua peixaria.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -83,6 +82,28 @@ export function LoginForm({ defaultEmail }: LoginFormProps) {
             noValidate
             className="flex flex-col gap-4"
           >
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name">Nome</Label>
+              <Input
+                id="name"
+                type="text"
+                autoComplete="name"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? "name-error" : undefined}
+                className="h-11 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
+                {...register("name")}
+              />
+              {errors.name && (
+                <p
+                  id="name-error"
+                  role="alert"
+                  className="text-sm text-destructive motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-top-1 motion-safe:duration-200"
+                >
+                  {errors.name.message}
+                </p>
+              )}
+            </div>
+
             <div className="flex flex-col gap-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -110,7 +131,7 @@ export function LoginForm({ defaultEmail }: LoginFormProps) {
               <Input
                 id="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 aria-invalid={Boolean(errors.password)}
                 aria-describedby={
                   errors.password ? "password-error" : undefined
@@ -131,31 +152,31 @@ export function LoginForm({ defaultEmail }: LoginFormProps) {
 
             <Button
               type="submit"
-              disabled={loginMutation.isPending}
+              disabled={registerMutation.isPending}
               className="h-11 mt-2 bg-primary text-primary-foreground shadow-sm
                 transition-all duration-200 hover:bg-primary/90 hover:shadow-md
                 motion-safe:hover:-translate-y-0.5 motion-safe:active:translate-y-0 motion-safe:active:scale-[0.98]"
             >
-              {loginMutation.isPending ? (
+              {registerMutation.isPending ? (
                 <>
                   <Loader2
                     className="mr-2 h-4 w-4 animate-spin"
                     aria-hidden="true"
                   />
-                  Entrando...
+                  Criando conta...
                 </>
               ) : (
-                "Entrar"
+                "Criar conta"
               )}
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
-              Não tem conta?{" "}
+              Já tem conta?{" "}
               <Link
-                href="/register"
+                href="/login"
                 className="font-medium text-primary underline-offset-4 transition-colors duration-200 hover:underline hover:text-primary/80"
               >
-                Criar conta
+                Entrar
               </Link>
             </p>
           </form>
