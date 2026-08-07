@@ -22,7 +22,24 @@ export function Providers({ children }: { children: ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {children}
-        <Toaster richColors position="top-center" />
+        <Toaster
+          theme="light"
+          position="top-right"
+          toastOptions={{
+            classNames: {
+              toast:
+                "!bg-surface !text-foreground !border !border-border !shadow-elevation-md",
+              title: "!text-foreground !font-medium",
+              description: "!text-muted-foreground",
+              actionButton: "!bg-primary !text-primary-foreground",
+              cancelButton: "!bg-muted !text-foreground",
+              closeButton: "!bg-surface !text-muted-foreground !border-border",
+              success: "!border-success/30 [&_svg]:!text-success",
+              error: "!border-destructive/30 [&_svg]:!text-destructive",
+              warning: "!border-warning/30 [&_svg]:!text-warning",
+            },
+          }}
+        />
       </AuthProvider>
     </QueryClientProvider>
   );
