@@ -20,10 +20,9 @@ export function CartItemRow({
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3 transition-colors hover:bg-accent/40">
-      {/* Linha 1: nome (com espaço total) + remover */}
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className="break-words font-medium leading-snug text-foreground">
+          <p className="wrap-break-word font-medium leading-snug text-foreground">
             {line.productName}
           </p>
           <p className="text-xs text-muted-foreground">
@@ -42,7 +41,6 @@ export function CartItemRow({
         </Button>
       </div>
 
-      {/* Linha 2: stepper + subtotal */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1 rounded-md border border-border">
           <Button
@@ -60,7 +58,7 @@ export function CartItemRow({
           >
             <Minus className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
-          <span className="min-w-[3.5rem] text-center text-sm font-medium tabular-nums text-foreground">
+          <span className="min-w-14 text-center text-sm font-medium tabular-nums text-foreground">
             {formatKg(line.quantitySold)}
           </span>
           <Button
