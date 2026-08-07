@@ -9,6 +9,7 @@ import {
 import { formatCurrency, formatKg } from "@/lib/formatters";
 import { LowStockBadge } from "../LowStockBadge/LowStockBadge";
 import { EditProductDialog } from "../EditProductDialog/EditProductDialog";
+import { DeleteProductDialog } from "../DeleteProductDialog/DeleteProductDialog";
 import type { Product } from "@/types/stock";
 
 interface ProductTableProps {
@@ -66,8 +67,11 @@ export function ProductTable({ products, lowStockIds }: ProductTableProps) {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-right">
-                  <EditProductDialog product={product} />
+                <TableCell>
+                  <div className="flex items-center justify-end gap-1">
+                    <EditProductDialog product={product} />
+                    <DeleteProductDialog product={product} />
+                  </div>
                 </TableCell>
               </TableRow>
             );
