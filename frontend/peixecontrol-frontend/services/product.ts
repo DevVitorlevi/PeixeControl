@@ -21,4 +21,8 @@ export const productService = {
     const { data } = await api.patch<Product>(`/products/${id}`, input);
     return data;
   },
+
+  async remove(id: string): Promise<void> {
+    await api.delete(`/products/${id}`);
+  },
 };
