@@ -1,23 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, ShoppingBag } from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { ShoppingBag } from "lucide-react";
 import { CartItemRow } from "@/components/CartItemRow/CartItemRow";
-import { formatCurrency } from "@/lib/formatters";
-import { playSound } from "@/lib/sounds";
-import { useCreateSale } from "@/hooks/useCreateSale";
+import { CartCheckoutFooter } from "@/components/CartCheckoutFooter/CartCheckoutFooter";
+import { useSaleCheckout } from "@/hooks/useSaleCheckout";
 import type { CartLine } from "@/hooks/useCart";
-
-const PAYMENT_METHODS = ["Dinheiro", "Cartão", "Pix"] as const;
 
 interface CartPanelProps {
   lines: CartLine[];
@@ -34,44 +21,7 @@ export function CartPanel({
   onRemove,
   onCleared,
 }: CartPanelProps) {
-  const [paymentMethod, setPaymentMethod] = useState<string>("Pix");
-  const createSale = useCreateSale();
-
-  const hasInvalidLine = lines.some((line) => line.quantitySold <= 0);
-  const canConfirm =
-    lines.length > 0 && !hasInvalidLine && Boolean(paymentMethod);
-
-  function handlePaymentMethodChange(value: string | null) {
-    // forma de pagamento é obrigatória — ignora tentativa de limpar a seleção
-    if (value) setPaymentMethod(value);
-  }
-
-  function handleConfirm() {
-    if (!canConfirm) return;
-
-    createSale.mutate(
-      {
-        items: lines.map((line) => ({
-          productId: line.productId,
-          quantitySold: line.quantitySold,
-        })),
-        paymentMethod,
-      },
-      {
-        onSuccess: () => {
-          playSound("saleCompleted");
-          toast.success("Venda registrada com sucesso");
-          onCleared();
-        },
-        onError: (error) => {
-          const message =
-            (error as { response?: { data?: { message?: string } } })?.response
-              ?.data?.message ?? "Não foi possível registrar a venda";
-          toast.error(message);
-        },
-      },
-    );
-  }
+  const checkout = useSaleCheckout({ lines, onCleared });
 
   if (lines.length === 0) {
     return (
@@ -99,49 +49,16 @@ export function CartPanel({
         ))}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <label
-          htmlFor="payment-method"
-          className="text-sm font-medium text-foreground"
-        >
-          Forma de pagamento
-        </label>
-        <Select value={paymentMethod} onValueChange={handlePaymentMethodChange}>
-          <SelectTrigger id="payment-method" className="h-11">
-            <SelectValue placeholder="Selecione…" />
-          </SelectTrigger>
-          <SelectContent>
-            {PAYMENT_METHODS.map((method) => (
-              <SelectItem key={method} value={method}>
-                {method}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="border-t border-border pt-3">
+        <CartCheckoutFooter
+          paymentMethod={checkout.paymentMethod}
+          onPaymentMethodChange={checkout.handlePaymentMethodChange}
+          total={total}
+          canConfirm={checkout.canConfirm}
+          isPending={checkout.isPending}
+          onConfirm={checkout.handleConfirm}
+        />
       </div>
-
-      <div className="flex items-center justify-between border-t border-border pt-3">
-        <span className="font-medium text-foreground">Total</span>
-        <span className="text-xl font-semibold tabular-nums text-primary">
-          {formatCurrency(total)}
-        </span>
-      </div>
-
-      <Button
-        type="button"
-        className="h-11 w-full gap-2"
-        disabled={!canConfirm || createSale.isPending}
-        onClick={handleConfirm}
-      >
-        {createSale.isPending ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-            Registrando…
-          </>
-        ) : (
-          "Confirmar venda"
-        )}
-      </Button>
     </div>
   );
 }
