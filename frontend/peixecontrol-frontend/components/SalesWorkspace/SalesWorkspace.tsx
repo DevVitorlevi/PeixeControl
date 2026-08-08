@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingBag, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/sheet";
 import { ProductPicker } from "@/components/ProductPicker/ProductPicker";
 import { CartPanel } from "@/components/CartPanel/CartPanel";
+import { CartItemRow } from "@/components/CartItemRow/CartItemRow";
+import { CartCheckoutFooter } from "@/components/CartCheckoutFooter/CartCheckoutFooter";
 import { useCart } from "@/hooks/useCart";
+import { useSaleCheckout } from "@/hooks/useSaleCheckout";
 
 export function SalesWorkspace() {
   const cart = useCart();
@@ -23,13 +26,17 @@ export function SalesWorkspace() {
     setMobileCartOpen(false);
   }
 
+  const checkout = useSaleCheckout({
+    lines: cart.lines,
+    onCleared: handleCleared,
+  });
+
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_360px]">
       <div className="min-w-0">
         <ProductPicker onAddToCart={cart.addProduct} />
       </div>
 
-      {/* Desktop: carrinho fixo lateral (SDD §5) */}
       <aside className="hidden md:block">
         <div className="sticky top-6 rounded-lg border border-border bg-surface p-4 shadow-elevation">
           <h2 className="mb-4 text-lg font-semibold text-foreground">
@@ -45,7 +52,6 @@ export function SalesWorkspace() {
         </div>
       </aside>
 
-      {/* Mobile: botão flutuante + drawer inferior (SDD §5) */}
       {cart.itemCount > 0 && (
         <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
           <Button
@@ -63,23 +69,55 @@ export function SalesWorkspace() {
       <Sheet open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
         <SheetContent
           side="bottom"
-          className="max-h-[85vh] overflow-y-auto rounded-t-2xl md:hidden"
+          initialFocus={false}
+          className="flex max-h-[88vh] flex-col gap-0 rounded-t-2xl p-0 md:hidden"
         >
-          <SheetHeader>
+          <SheetHeader className="border-b border-border px-4 py-4 text-left">
             <SheetTitle>Carrinho</SheetTitle>
             <SheetDescription>
               Revise os itens antes de confirmar a venda.
             </SheetDescription>
           </SheetHeader>
-          <div className="mt-4">
-            <CartPanel
-              lines={cart.lines}
-              total={cart.total}
-              onUpdateQuantity={cart.updateQuantity}
-              onRemove={cart.removeLine}
-              onCleared={handleCleared}
-            />
+
+          <div className="flex-1 overflow-y-auto px-4 py-4">
+            {cart.lines.length === 0 ? (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-light">
+                  <ShoppingBag
+                    className="h-7 w-7 text-primary"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="text-muted-foreground">
+                  Adicione produtos para iniciar uma venda.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {cart.lines.map((line) => (
+                  <CartItemRow
+                    key={line.productId}
+                    line={line}
+                    onUpdateQuantity={cart.updateQuantity}
+                    onRemove={cart.removeLine}
+                  />
+                ))}
+              </div>
+            )}
           </div>
+
+          {cart.lines.length > 0 && (
+            <div className="border-t border-border bg-surface px-4 pt-4 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-elevation-md">
+              <CartCheckoutFooter
+                paymentMethod={checkout.paymentMethod}
+                onPaymentMethodChange={checkout.handlePaymentMethodChange}
+                total={cart.total}
+                canConfirm={checkout.canConfirm}
+                isPending={checkout.isPending}
+                onConfirm={checkout.handleConfirm}
+              />
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     </div>
