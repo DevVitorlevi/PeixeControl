@@ -2,10 +2,10 @@
 
 import { AlertCircle, Receipt } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { SaleListItem } from "@/components/SaleListItem/SaleListItem";
 import { useSalesHistory } from "@/hooks/useSalesHistory";
-import { formatCurrency, formatKg, formatTime } from "@/lib/formatters";
+import { formatCurrency } from "@/lib/formatters";
 
 interface SalesHistoryListProps {
   date: string;
@@ -33,6 +33,7 @@ export function SalesHistoryList({ date }: SalesHistoryListProps) {
       </div>
     );
   }
+
   if (isError) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed border-border bg-surface p-8 text-center">
@@ -76,35 +77,9 @@ export function SalesHistoryList({ date }: SalesHistoryListProps) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
-        {sales.map((sale) => {
-          const itemsSummary = sale.items
-            .map(
-              (item) => `${item.productName} (${formatKg(item.quantitySold)})`,
-            )
-            .join(", ");
-
-          return (
-            <div
-              key={sale._id}
-              className="flex flex-col gap-1 rounded-lg border border-border bg-surface p-3"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-foreground tabular-nums">
-                    {formatTime(sale.saleDate)}
-                  </span>
-                  <Badge variant="secondary">{sale.paymentMethod}</Badge>
-                </div>
-                <span className="font-semibold text-foreground tabular-nums">
-                  {formatCurrency(sale.total)}
-                </span>
-              </div>
-              <p className="truncate text-sm text-muted-foreground">
-                {itemsSummary}
-              </p>
-            </div>
-          );
-        })}
+        {sales.map((sale) => (
+          <SaleListItem key={sale._id} sale={sale} />
+        ))}
       </div>
 
       <div className="flex items-center justify-between rounded-lg bg-primary-light px-4 py-3">
