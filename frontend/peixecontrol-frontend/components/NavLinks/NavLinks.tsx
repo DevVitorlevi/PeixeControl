@@ -15,12 +15,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Estoque", href: "/stock", icon: Package },
   { label: "Vendas", href: "/sales", icon: ShoppingCart },
-  {
-    label: "Relatórios",
-    href: "/reports",
-    icon: BarChart3,
-    comingSoon: true,
-  },
+  { label: "Relatórios", href: "/reports", icon: BarChart3 },
   {
     label: "Movimentações",
     href: "/stock-history",
