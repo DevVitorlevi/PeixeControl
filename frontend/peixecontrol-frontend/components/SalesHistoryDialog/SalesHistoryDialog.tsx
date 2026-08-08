@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, History } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  History,
+  Loader2,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +18,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { SalesHistoryList } from "@/components/SalesHistoryList/SalesHistoryList";
+import { useSalesHistory } from "@/hooks/useSalesHistory";
+import { useSalesPdfExport } from "@/hooks/useSalesPdfExport";
 import { formatDate, formatDateForApi } from "@/lib/formatters";
 
 function addDays(date: Date, delta: number): Date {
@@ -33,8 +41,13 @@ export function SalesHistoryDialog() {
   const [open, setOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => new Date());
 
+  const dateApi = formatDateForApi(selectedDate);
+  const { data: sales } = useSalesHistory(dateApi, { enabled: open });
+  const { exportPdf, isExporting } = useSalesPdfExport();
+
   function handleOpenChange(nextOpen: boolean) {
     setOpen(nextOpen);
+    // Sempre reabre no dia atual (nunca mantém navegação de uma sessão anterior)
     if (nextOpen) setSelectedDate(new Date());
   }
 
@@ -44,6 +57,24 @@ export function SalesHistoryDialog() {
 
   function handleNextDay() {
     setSelectedDate((prev) => (isToday(prev) ? prev : addDays(prev, 1)));
+  }
+
+  function handleExport() {
+    if (!sales || sales.length === 0) return;
+    const totalDoDia = sales.reduce((sum, sale) => sum + sale.total, 0);
+    const totalKgDoDia = sales.reduce(
+      (sum, sale) =>
+        sum + sale.items.reduce((s, item) => s + item.quantitySold, 0),
+      0,
+    );
+
+    exportPdf({
+      title: `Vendas do dia ${formatDate(selectedDate)}`,
+      sales,
+      totalSalesValue: totalDoDia,
+      totalQuantity: totalKgDoDia,
+      fileName: `vendas-${dateApi}.pdf`,
+    });
   }
 
   return (
@@ -99,8 +130,25 @@ export function SalesHistoryDialog() {
             </Button>
           </div>
 
+          <div className="flex justify-end py-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 gap-2"
+              onClick={handleExport}
+              disabled={isExporting || !sales || sales.length === 0}
+            >
+              {isExporting ? (
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              ) : (
+                <Download className="h-4 w-4" aria-hidden="true" />
+              )}
+              Exportar PDF
+            </Button>
+          </div>
+
           <div className="flex-1 overflow-y-auto py-4">
-            <SalesHistoryList date={formatDateForApi(selectedDate)} />
+            <SalesHistoryList date={dateApi} />
           </div>
         </DialogContent>
       </Dialog>
