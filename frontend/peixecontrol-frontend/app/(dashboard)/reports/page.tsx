@@ -1,5 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalesSummaryCards } from "@/components/SalesSummaryCards/SalesSummaryCards";
+import { TopProductsList } from "@/components/TopProductsList/TopProductsList";
+import { LowStockSummaryCard } from "@/components/LowStockSummaryCard/LowStockSummaryCard";
 
 export default function ReportsPage() {
   return (
@@ -37,11 +39,9 @@ export default function ReportsPage() {
           <SalesSummaryCards />
         </TabsContent>
 
-        <TabsContent
-          value="top-products"
-          className="rounded-lg border border-dashed border-border bg-surface p-8 text-center text-muted-foreground"
-        >
-          Top produtos e alerta de estoque baixo — chega em breve.
+        <TabsContent value="top-products" className="flex flex-col gap-6">
+          <LowStockSummaryCard />
+          <TopProductsList />
         </TabsContent>
 
         <TabsContent
