@@ -1,6 +1,6 @@
 import { api } from "@/lib/api";
 import type { Sale } from "@/types/sales";
-import type { SalesSummary, TopProduct } from "@/types/reports";
+import type { MonthlySummary, SalesSummary, TopProduct } from "@/types/reports";
 
 export const reportsService = {
   async getSalesHistory(date: string): Promise<Sale[]> {
@@ -23,6 +23,16 @@ export const reportsService = {
   async getTopProducts(date?: string): Promise<TopProduct[]> {
     const { data } = await api.get<TopProduct[]>("/reports/top-products", {
       params: date ? { date } : undefined,
+    });
+    return data;
+  },
+
+  async getMonthlySummary(
+    month: number,
+    year: number,
+  ): Promise<MonthlySummary> {
+    const { data } = await api.get<MonthlySummary>("/reports/monthly-summary", {
+      params: { month, year },
     });
     return data;
   },
