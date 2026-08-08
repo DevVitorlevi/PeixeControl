@@ -1,19 +1,31 @@
-const StockMovement = require('../models/StockMovement');
+const StockMovement = require("../models/StockMovement");
+
+function parseDateLocal(dateString) {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
 
 module.exports = {
   async list(req, res) {
     try {
-      const { date } = req.query;
+      const { date, startDate, endDate } = req.query;
       const userId = req.userId;
 
       let filter = { userId };
 
-      if (date) {
-        // Considerar o dia inteiro: de 00:00:00 a 23:59:59
-        const start = new Date(date);
+      if (startDate && endDate) {
+        const start = parseDateLocal(startDate);
         start.setHours(0, 0, 0, 0);
 
-        const end = new Date(date);
+        const end = parseDateLocal(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        filter.date = { $gte: start, $lte: end };
+      } else if (date) {
+        const start = parseDateLocal(date);
+        start.setHours(0, 0, 0, 0);
+
+        const end = parseDateLocal(date);
         end.setHours(23, 59, 59, 999);
 
         filter.date = { $gte: start, $lte: end };
@@ -22,7 +34,9 @@ module.exports = {
       const movements = await StockMovement.find(filter).sort({ date: -1 });
       return res.json(movements);
     } catch (error) {
-      return res.status(500).json({ message: 'Erro ao listar movimentações de estoque' });
+      return res
+        .status(500)
+        .json({ message: "Erro ao listar movimentações de estoque" });
     }
-  }
+  },
 };
