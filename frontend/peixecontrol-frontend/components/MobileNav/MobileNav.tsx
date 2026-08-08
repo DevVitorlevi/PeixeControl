@@ -37,7 +37,7 @@ export function MobileNav() {
       </Button>
 
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="flex w-72 flex-col">
+        <SheetContent side="right" className="flex w-72 flex-col">
           <SheetHeader>
             <SheetTitle className="flex items-center gap-2 text-left">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-light">
@@ -50,10 +50,7 @@ export function MobileNav() {
           <div className="mt-4 flex flex-1 flex-col justify-between">
             <NavLinks onNavigate={() => setOpen(false)} />
 
-            <div className="mt-6 border-t border-border pt-3">
-              <div className="mb-2 truncate px-2 text-xs text-muted-foreground">
-                {user?.name ?? "Usuário"}
-              </div>
+            <div className="mt-6 border-t border-border pt-3 mb-10">
               <Button
                 type="button"
                 variant="ghost"
