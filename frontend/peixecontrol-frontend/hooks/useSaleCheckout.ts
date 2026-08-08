@@ -6,7 +6,12 @@ import { playSound } from "@/lib/sounds";
 import { useCreateSale } from "@/hooks/useCreateSale";
 import type { CartLine } from "@/hooks/useCart";
 
-export const PAYMENT_METHODS = ["Dinheiro", "Cartão", "Pix"] as const;
+export const PAYMENT_METHODS = [
+  "Pix",
+  "Dinheiro",
+  "Cartão de Crédito",
+  "Cartão de Débito",
+] as const;
 
 interface UseSaleCheckoutParams {
   lines: CartLine[];
