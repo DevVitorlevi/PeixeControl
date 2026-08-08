@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SalesSummaryCards } from "@/components/SalesSummaryCards/SalesSummaryCards";
 
 export default function ReportsPage() {
   return (
@@ -32,11 +33,8 @@ export default function ReportsPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent
-          value="sales-summary"
-          className="rounded-lg border border-dashed border-border bg-surface p-8 text-center text-muted-foreground"
-        >
-          Resumo de vendas — chega na próxima sub-etapa.
+        <TabsContent value="sales-summary">
+          <SalesSummaryCards />
         </TabsContent>
 
         <TabsContent
