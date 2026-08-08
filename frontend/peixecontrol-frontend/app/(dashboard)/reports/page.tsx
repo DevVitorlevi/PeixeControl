@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalesSummaryCards } from "@/components/SalesSummaryCards/SalesSummaryCards";
 import { TopProductsList } from "@/components/TopProductsList/TopProductsList";
 import { LowStockSummaryCard } from "@/components/LowStockSummaryCard/LowStockSummaryCard";
+import { MonthlySummarySection } from "@/components/MonthlySummarySection/MonthlySummarySection";
 
 export default function ReportsPage() {
   return (
@@ -11,7 +12,7 @@ export default function ReportsPage() {
           Relatórios
         </h1>
         <p className="mt-1 text-muted-foreground">
-          Acompanhe vendas, produtos mais vendidos, lucro e o resumo mensal.
+          Acompanhe vendas, produtos mais vendidos e o resumo mensal.
         </p>
         <div
           aria-hidden="true"
@@ -27,9 +28,6 @@ export default function ReportsPage() {
           <TabsTrigger value="top-products" className="h-11 shrink-0 px-4">
             Top produtos
           </TabsTrigger>
-          <TabsTrigger value="profit" className="h-11 shrink-0 px-4">
-            Lucro
-          </TabsTrigger>
           <TabsTrigger value="monthly" className="h-11 shrink-0 px-4">
             Mensal
           </TabsTrigger>
@@ -44,18 +42,8 @@ export default function ReportsPage() {
           <TopProductsList />
         </TabsContent>
 
-        <TabsContent
-          value="profit"
-          className="rounded-lg border border-dashed border-border bg-surface p-8 text-center text-muted-foreground"
-        >
-          Lucro total — chega em breve.
-        </TabsContent>
-
-        <TabsContent
-          value="monthly"
-          className="rounded-lg border border-dashed border-border bg-surface p-8 text-center text-muted-foreground"
-        >
-          Resumo mensal — chega em breve.
+        <TabsContent value="monthly">
+          <MonthlySummarySection />
         </TabsContent>
       </Tabs>
     </main>
