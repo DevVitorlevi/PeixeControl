@@ -12,3 +12,13 @@ export interface ProductInput {
   pricePerKg: number;
   quantity: number;
 }
+
+export interface StockMovement {
+  _id: string;
+  userId: string;
+  productId: string;
+  productName: string;
+  type: "Entrada" | "Saída";
+  quantity: number;
+  date: string;
+}
