@@ -16,12 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Estoque", href: "/stock", icon: Package },
   { label: "Vendas", href: "/sales", icon: ShoppingCart },
   { label: "Relatórios", href: "/reports", icon: BarChart3 },
-  {
-    label: "Movimentações",
-    href: "/stock-history",
-    icon: ArrowLeftRight,
-    comingSoon: true,
-  },
+  { label: "Movimentações", href: "/stock-history", icon: ArrowLeftRight },
 ];
 
 interface NavLinksProps {
