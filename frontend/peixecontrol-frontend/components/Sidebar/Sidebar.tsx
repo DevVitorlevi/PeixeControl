@@ -6,7 +6,7 @@ import { NavLinks } from "@/components/NavLinks/NavLinks";
 import { useAuth } from "@/hooks/useAuth";
 
 export function Sidebar() {
-  const { user, signOut } = useAuth();
+  const { signOut } = useAuth();
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-border bg-surface md:flex">
@@ -24,9 +24,6 @@ export function Sidebar() {
       </div>
 
       <div className="border-t border-border p-3">
-        <div className="mb-2 truncate px-2 text-xs text-muted-foreground">
-          {user?.name ?? "Usuário"}
-        </div>
         <Button
           type="button"
           variant="ghost"
