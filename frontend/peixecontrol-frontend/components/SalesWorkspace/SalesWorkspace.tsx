@@ -32,12 +32,12 @@ export function SalesWorkspace() {
   });
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-[1fr_360px]">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
       <div className="min-w-0">
         <ProductPicker onAddToCart={cart.addProduct} />
       </div>
 
-      <aside className="hidden md:block">
+      <aside className="hidden lg:block">
         <div className="sticky top-6 rounded-lg border border-border bg-surface p-4 shadow-elevation">
           <h2 className="mb-4 text-lg font-semibold text-foreground">
             Carrinho
@@ -53,7 +53,7 @@ export function SalesWorkspace() {
       </aside>
 
       {cart.itemCount > 0 && (
-        <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
+        <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
           <Button
             type="button"
             className="h-14 w-full gap-2 shadow-elevation-md"
@@ -70,7 +70,7 @@ export function SalesWorkspace() {
         <SheetContent
           side="bottom"
           initialFocus={false}
-          className="flex max-h-[88vh] flex-col gap-0 rounded-t-2xl p-0 md:hidden"
+          className="flex max-h-[88vh] flex-col gap-0 rounded-t-2xl p-0 lg:hidden"
         >
           <SheetHeader className="border-b border-border px-4 py-4 text-left">
             <SheetTitle>Carrinho</SheetTitle>
