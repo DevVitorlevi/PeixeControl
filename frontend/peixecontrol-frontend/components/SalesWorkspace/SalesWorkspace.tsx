@@ -37,8 +37,10 @@ export function SalesWorkspace() {
         <ProductPicker onAddToCart={cart.addProduct} />
       </div>
 
-      <aside className="hidden lg:block">
-        <div className="sticky top-6 rounded-lg border border-border bg-surface p-4 shadow-elevation">
+      {/* Tablet: empilhado abaixo do ProductPicker, sempre visível.
+          Desktop (lg+): mesmo bloco vira coluna lateral fixa via grid. */}
+      <div className="hidden md:block">
+        <div className="rounded-lg border border-border bg-surface p-4 shadow-elevation lg:sticky lg:top-6">
           <h2 className="mb-4 text-lg font-semibold text-foreground">
             Carrinho
           </h2>
@@ -50,10 +52,11 @@ export function SalesWorkspace() {
             onCleared={handleCleared}
           />
         </div>
-      </aside>
+      </div>
 
+      {/* Mobile (abaixo de md): botão flutuante + Sheet, igual antes */}
       {cart.itemCount > 0 && (
-        <div className="fixed inset-x-4 bottom-4 z-40 lg:hidden">
+        <div className="fixed inset-x-4 bottom-4 z-40 md:hidden">
           <Button
             type="button"
             className="h-14 w-full gap-2 shadow-elevation-md"
@@ -70,7 +73,7 @@ export function SalesWorkspace() {
         <SheetContent
           side="bottom"
           initialFocus={false}
-          className="flex max-h-[88vh] flex-col gap-0 rounded-t-2xl p-0 lg:hidden"
+          className="flex max-h-[88vh] flex-col gap-0 rounded-t-2xl p-0 md:hidden"
         >
           <SheetHeader className="border-b border-border px-4 py-4 text-left">
             <SheetTitle>Carrinho</SheetTitle>
