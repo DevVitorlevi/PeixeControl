@@ -25,7 +25,7 @@ export function ProductList() {
     [lowStockQuery.data],
   );
 
-  useLowStockSoundAlert(lowStockIds.size > 0);
+  useLowStockSoundAlert(lowStockQuery.data ?? []);
 
   const filteredProducts = useMemo(() => {
     const products = productsQuery.data ?? [];
