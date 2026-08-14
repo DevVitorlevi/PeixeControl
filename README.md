@@ -55,8 +55,8 @@ Confira o sistema funcionando no link:
 ### 🛠️ Tecnologias Utilizadas
 
 | Tecnologia           | Descrição                                     |
-|----------------------|----------------------------------------------|
-| **ReactJS**          | Framework Front-End                           |
+|----------------------|-----------------------------------------------|
+| **Next.js**          | Framework Front-End                           |
 | **Tailwind CSS**     | Framework de Estilização                      |
 | **ShadCN/UI**        | Biblioteca de Componentes                     |
 | **Node.js**          | Runtime do back-end                           |
