@@ -59,28 +59,22 @@ export function RegisterForm() {
   return (
     <div className="flex w-full items-center justify-center">
       <Card
-        className="w-full max-w-sm overflow-hidden border-border shadow-lg shadow-primary/5
+        className="w-full max-w-sm sm:max-w-md overflow-hidden border-border shadow-lg shadow-primary/5
           motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-4 motion-safe:duration-500"
       >
-        <CardHeader className="items-center text-center gap-2">
-          <div
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 text-primary
-              transition-transform duration-300 motion-safe:hover:scale-110"
-          >
-            <Fish className="h-5 w-5" aria-hidden="true" />
-          </div>
-          <CardTitle className="font-heading">
+        <CardHeader className="items-center gap-2 px-4 pt-6 text-center sm:px-6">
+          <CardTitle className="font-heading text-lg sm:text-xl">
             Criar conta no PeixeControl
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm">
             Cadastre-se para começar a gerenciar sua peixaria.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-6 sm:px-6">
           <form
             onSubmit={handleSubmit(onSubmit)}
             noValidate
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-3 sm:gap-4"
           >
             <div className="flex flex-col gap-2">
               <Label htmlFor="name">Nome</Label>
@@ -90,7 +84,7 @@ export function RegisterForm() {
                 autoComplete="name"
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? "name-error" : undefined}
-                className="h-11 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-11 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
                 {...register("name")}
               />
               {errors.name && (
@@ -109,10 +103,11 @@ export function RegisterForm() {
               <Input
                 id="email"
                 type="email"
+                inputMode="email"
                 autoComplete="email"
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? "email-error" : undefined}
-                className="h-11 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-11 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
                 {...register("email")}
               />
               {errors.email && (
@@ -136,7 +131,7 @@ export function RegisterForm() {
                 aria-describedby={
                   errors.password ? "password-error" : undefined
                 }
-                className="h-11 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
+                className="h-11 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-primary/40"
                 {...register("password")}
               />
               {errors.password && (
