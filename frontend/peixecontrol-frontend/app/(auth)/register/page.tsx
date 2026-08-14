@@ -16,7 +16,7 @@ export default function RegisterPage() {
   }, [isHydrating, isAuthenticated, router]);
 
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-linear-to-b from-background via-background to-primary">
+    <main className="flex min-h-dvh w-full items-center justify-center bg-linear-to-b from-background via-background to-primary px-4 py-8 sm:px-6">
       <RegisterForm />
     </main>
   );
