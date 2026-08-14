@@ -48,8 +48,8 @@ Confira o sistema funcionando no link:
 🌐 [https://peixe-control.vercel.app/](https://peixe-control.vercel.app/)
 
 🔑 **Login de teste:**
-- 📧 **Email:** bompeixe1@gmail.com
-- 🔒 **Senha:** Peixaria123
+- 📧 **Email:** visitor@gmail.com
+- 🔒 **Senha:** Visitor123
 ---
 
 ### 🛠️ Tecnologias Utilizadas
@@ -58,7 +58,7 @@ Confira o sistema funcionando no link:
 |----------------------|----------------------------------------------|
 | **ReactJS**          | Framework Front-End                           |
 | **Tailwind CSS**     | Framework de Estilização                      |
-| **ShadCN/UI**        |                                               |
+| **ShadCN/UI**        | Biblioteca de Componentes                     |
 | **Node.js**          | Runtime do back-end                           |
 | **Express.js**       | Framework para rotas e APIs                   |
 | **MongoDB**          | Banco de dados NoSQL                          |
